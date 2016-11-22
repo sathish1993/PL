@@ -1,0 +1,212 @@
+\documentclass[12pt]{article}
+%\usepackage{html}
+\usepackage{hyperref}
+\title{CS 571\\Quiz 2}
+%\addtolength{\topmargin}{-2cm}
+%\addtolength{\topskip}{-2cm}
+%\addtolength{\oddsidemargin}{-2cm}
+%\addtolength{\evensidemargin}{-2cm}
+%\addtolength{\textheight}{2cm}
+%\addtolength{\textwidth}{2cm}
+%\addtolength{\footskip}{-1cm}
+\date{}
+\begin{document}
+\maketitle
+
+\begin{flushleft}
+\textbf{Oct 5}\hfill\textbf{Closed book}\\
+\textbf{15 points}\hfill\textbf{Closed notes}\\
+
+\vspace{0.5cm}
+
+\textbf{Important Reminder}: As per the course Academic Honesty
+Statement, cheating of any kind will minimally result in receiving an
+F letter grade for the entire course.
+
+
+\end{flushleft}
+
+For each of the following questions, select a \textbf{single}
+alternative on the grid-sheet.  Please ensure that you have filled-in
+your name and B-number in the bubbles on the provided grid-sheet.
+
+There are 7 questions with 2-points per question; there is 1-point
+for submitting the quiz.
+
+\begin{enumerate}
+
+\item Which of the following languages over the vocabulary of
+  parentheses $\{$\verb@(@, \verb@)@$\}$ is not expressible using
+  standard regular expressions?
+
+\begin{enumerate}
+
+\item Strings whose length is exactly 3.  Examples include \verb@()(@,
+  \verb@)()@ and \verb@())@.
+  
+\item Strings of even length.  Examples include
+  the empty string, \verb@((@, \verb@()()@ and \verb@(())@.
+
+\item Strings of length less-than-or-equal-to 4 which consist of
+  balanced parentheses. 
+    Examples include the empty string, \verb@()@ and \verb@()()@.
+
+\item Strings of even length containing 1-or-more \verb@(@'s
+  followed by 0-or-more \verb@)@'s.  Examples include \verb@((@,
+  \verb@()))@ and \verb@(())@.
+
+\item Strings of even length which consist of balanced parentheses.
+  Examples include the empty string, \verb@()@ and \verb@()(())@.
+
+\end{enumerate}
+
+\item Given the following CFG over the set of terminals $\{$\verb@NUM@, \verb@ID@, \verb@','@, \verb@';'@$\}$:
+
+\begin{verbatim}
+list
+  : ID tail
+  ;
+tail
+  : ',' NUM tail
+  | ',' ID tail
+  | /* empty */
+  | ';'
+  ;
+\end{verbatim}
+
+Which one of the following describes the language defined by the above
+CFG most precisely?
+
+\begin{enumerate}
+
+\item Lists of \verb@ID@'s and \verb@NUM@'s 
+  separated by \verb@','@ and terminated by \verb@';'@.
+  
+\item Lists of \verb@ID@'s and \verb@NUM@'s starting with a \verb@ID@,
+  separated by \verb@','@ and optionally terminated by \verb@';'@.
+
+\item Lists of \verb@ID@'s and \verb@NUM@'s 
+  separated by \verb@','@.
+  
+\item Lists of \verb@ID@'s and \verb@NUM@'s 
+  separated by \verb@','@ and optionally terminated by \verb@';'@.
+  
+\item Lists of \verb@ID@'s and \verb@NUM@'s starting with a \verb@ID@,
+  separated by \verb@','@ and terminated by \verb@';'@.
+    
+\end{enumerate}
+
+\item In Javascript, \textit{hoisting} refers to:
+\begin{enumerate}
+
+\item Moving \verb@var@ declarations to the start
+  of a block.
+
+\item Moving \verb@var@ declarations to the start
+  of a function.
+
+\item Moving \verb@var@ declarations to the \verb@window@ object.
+
+\item Moving \verb@let@ declarations to the start
+  of a block.
+
+\item Moving \verb@let@ declarations to the start
+  of a function.
+
+\end{enumerate}
+
+\newpage
+
+
+\item Heap allocation is the only alternative for
+
+\begin{enumerate}
+
+\item Entities having a lifetime equal to that of the entire
+  program.
+
+\item Entities having a lifetime equal to that of a function activation.
+
+\item Entities having a lifetime equal to that of a block activation.
+
+\item Entities which are function parameters.
+
+\item Entities which have indeterminate lifetime.
+
+\end{enumerate}
+
+
+\item Temporary variables within a stack frame refer to
+
+\begin{enumerate}
+
+  \item Variables declared to be temporary by the programmer.
+
+  \item Variables introduced by the programmer to implement the
+    exchange of the values of two variables.
+
+  \item Variables which contain references to heap data.
+
+  \item Variables introduced by the compiler to hold
+    the variables of a function while it is active.
+
+  \item Variables introduced by the compiler to hold intermediate
+    values computed while evaluating an expression.
+         
+    
+\end{enumerate}
+
+\newpage
+
+\item Assuming that all declarations introduced using \verb@var@ in
+  the following pseudo-code are dynamically scoped, what will be
+  the output of the following program?
+
+\begin{verbatim}
+var a = 11;
+
+f() { var a = 22; h(); }
+
+h() { print a; }
+
+print a; f(); print a;
+\end{verbatim}
+
+\begin{enumerate}
+
+\item \verb@11 11 11@
+
+\item \verb@11 22 11@
+
+\item \verb@11 22 22@
+
+\item \verb@11 11 22@
+
+\item \verb@22 11 22@
+    
+\end{enumerate}
+
+\newpage
+
+\item Which one of the following statements is false?
+
+\begin{enumerate}
+
+\item Scheme is dynamically scoped.
+
+\item In some languages, there can be \textit{holes} within the scope
+  of a variable.
+
+\item A context-free grammar can describe nested constructs.
+
+\item In C, the declaration \verb@struct S;@ can be used to make a
+  forward-reference to a structure type.
+
+\item Static allocation cannot be the sole allocation strategy in
+  the presence of recursive functions.
+
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}

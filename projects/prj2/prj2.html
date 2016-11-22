@@ -1,0 +1,400 @@
+<html>
+<head>
+<title>Project 2: Scheme Programming </title>
+</head>
+<body bgcolor="#ffffff">
+<h1 align="center">Project 2: Scheme Programming </h1>
+<p>
+<b>Due Date</b>: 10/20 by 11:59p
+</p>
+<p>
+<b>Important Reminder</b>: As per the course Academic Honesty Statement,
+cheating of any kind will minimally result in receiving an F letter
+grade for the entire course.
+</p>
+<h2>Aims of This Project</h2>
+<p>
+The aims of this project are as follows:
+</p>
+<ul>
+<p><li>
+To become adept with recursive programming.
+</p>
+<p><li>
+To expose you to functional programming.
+</p>
+<p><li>
+To familiarize you with imperative programming without
+    destructive assignment.
+</p>
+</ul>
+<h2>Project Specification</h2>
+<p>
+You are required to submit a <tt>prj2.tar.gz</tt> archive such that unpacking
+that archive into an empty directory and changing into that directory
+will allow you to run implementations of the following using the
+racket dialect of Scheme installed on <tt>remote.cs</tt>.
+</p>
+<p>
+The <tt>^</tt> operator is used below to indicate exponentiation.
+</p>
+<ol type="1">
+<p><li>
+Repeat <a href="../prj1/prj1.html">prj1</a> in Scheme.  Specifically,
+      complete the code provided in the ugly-regexp <a href="./files/ugly-regexp/parser.rkt">parser</a> such that running the
+      parser as:
+<pre>
+      $ ./ugly-regexp/parser.rkt FILE
+</pre>
+<p>
+      translates <i>ugly regular expressions</i> to standard regex
+      syntax exactly as in Project 1.  The output (including
+      errors) should not be modified from that which is generated
+      by the provided code.
+</p>
+</p>
+<p><li>
+Write a function <tt>(quadratic-roots a b c)</tt> which returns a
+      2-element list containing the 2 roots of the quadratic equation
+      <tt>a*x^2 + b*x + c = 0</tt> using the classical formula for the roots of
+      a quadratic equation.  The first element in the returned list
+      should use the positive square-root of the discriminant, the
+      second element should use the negative square-root of the
+      discriminant.  During the course of the computation, no
+      expression should be evaluated more than once.
+</p>
+<p><li>
+Write a function <tt>(mul-list list x)</tt> which when given a
+      proper list <tt>list</tt> of numbers returns the list formed by
+      multiplying each element of <tt>list</tt> by <tt>x</tt>.
+</p>
+<p><li>
+Write a function <tt>(sum-lengths list)</tt> which when given
+      a proper list <tt>list</tt> of proper lists returns the sum of the
+      lengths of all the lists contained directly in <tt>list</tt>.
+</p>
+<p><li>
+Write a function <tt>(poly-eval coeffs x)</tt> which evaluates the
+      polyomial specified by list <tt>coeffs</tt> at <tt>x</tt>.  Specifically,
+      given a list of <tt>n + 1</tt> numeric polynomial coefficients <tt>coeffs</tt>
+      <tt>(c[n] c[n-1] ... c[0])</tt> and a number <tt>x</tt> return the value of
+      <tt>c[n]*x^n + c[n-1]*x^(n-1) + ... + c[1]*x + c[0]</tt>.  Your
+      computation should evaluate each term as written above;
+      i.e. each <tt>c[i]*x^i</tt> term should be explicitly evaluated and
+      added together.
+</p>
+<p><li>
+Write a function <tt>(poly-eval-horner coeffs x)</tt> which uses
+      <a href="https://en.wikipedia.org/wiki/Horner%27s_method">Horner's</a>
+      method to evaluate the polynomial given by list <tt>coeffs</tt>
+      at number <tt>x</tt>.  The list <tt>coeffs</tt> is as specified in (5).
+</p>
+<p><li>
+Write a function <tt>(count-occurrences s-exp x)</tt> which given
+      a Scheme s-expression <tt>s-exp</tt> returns the number of
+      sub-expressions which are <tt>equal?</tt> to <tt>x</tt>.
+</p>
+<p><li>
+Write a function <tt>(eval-arith exp)</tt> which returns the result of
+      evaluating arithmetic expression <tt>exp</tt>, where <tt>exp</tt> is either a
+      Scheme number or one of <tt>(</tt><i>op</i> <tt>exp_1 exp_2)</tt> where <i>op</i> is one
+      of <tt>'add</tt>, <tt>'sub</tt>, <tt>'mul</tt> or <tt>'div</tt> specifying respectively the
+      binary arithmetic operators <tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>.
+</p>
+<p><li>
+Write a function <tt>(sum-lengths-tr list)</tt> with the same
+      specification as (4) with the additional requirement that all
+      recursive calls must be tail-recursive.
+</p>
+<p><li>
+Write a function <tt>(poly-eval-tr coeffs x)</tt> with the same
+      specification as (5) with the additional requirement that all
+      recursive calls must be tail-recursive.
+</p>
+<p><li>
+Write a function <tt>(mul-list-2 list x)</tt> with the same specification
+      as (3) but which replaces all recursion with the use of one or
+      more of <tt>map</tt>, <tt>foldl</tt> or <tt>foldr</tt>.
+</p>
+<p><li>
+Write a function <tt>(sum-lengths-2 list)</tt> with the same
+      specification as (4) but which replaces all recursion with the use
+      of one or more of <tt>map</tt>, <tt>foldl</tt> or <tt>foldr</tt>.
+</p>
+</ol>
+<p>
+The project is subject to the following additional restrictions:
+</p>
+<ul>
+<p><li>
+The solution for (1) must be in the file which unpacks into the
+    file <tt>ugly-regexp/parser.rkt</tt>.  The archive should also contain
+    any auxiliary files required by that file.
+</p>
+<p><li>
+The solutions for (2-12) must be in the file <tt>fns.rkt</tt>.
+</p>
+<p><li>
+The code created by you may not contain any use of Scheme's
+    mutation operators; i.e. no Scheme function with name ending
+    in <tt>!</tt> may be used.
+</p>
+<p><li>
+Solutions 2-12 should not define any top-level auxiliary functions;
+    i.e. any auxiliary functions needed for the operation of a
+    required function should be defined within that function.
+</p>
+<p><li>
+None of the functions may use <tt>map</tt>, <tt>foldl</tt>, or <tt>foldr</tt> unless
+    explicitly specified.
+</p>
+<p><li>
+Some of the function specifications give implementation
+    restrictions.  Those must be followed.
+</p>
+</ul>
+<h2>Example Log</h2>
+<p>
+The following provides a log of interaction with the code submitted
+with this project:
+</p>
+<pre>
+$ ./ugly-regexp/parser.rkt -
+(chars(a) . chars(b)) + *chars(c)
+((([a][b]))|[c]*)
+(chars(a) . chars(b)) + chars(c)*
+&lt;stdin&gt;:2:32: syntax error at '*', expecting '&lt;NL&gt;'
+chars(a) . chars(b) + *chars(c)
+([a]([b]|[c]*))
+$ racket
+Welcome to Racket v6.1.
+&gt; (load "fns.rkt")
+&gt; (quadratic-roots 3 -6 3)
+'(1 1)
+&gt; (quadratic-roots 1 -10 34)
+'(5+3i 5-3i)
+&gt; (mul-list '() 22)
+'()
+&gt; (mul-list '(1 2 5) 22)
+'(22 44 110)
+&gt; (sum-lengths '((1 2 (3 4)) ((5 6)) ()))
+4
+&gt; (sum-lengths '((1) (2 (3 . 4))))
+3
+&gt; (poly-eval '(1 2 3 4) 3)
+58
+&gt; (poly-eval-horner '(2 3 4) 4)
+48
+&gt; (count-occurrences '((a b c) a (c (d a) b)) 'a)
+3
+&gt; (count-occurrences '((a b c) a (c (d a) b)) '(d a))
+1
+&gt; (count-occurrences '() 'a)
+0
+&gt; (eval-arith '(add (mul 8 5) 2))
+42
+&gt; (eval-arith '(sub (mul 11 5) 13))
+42
+&gt; (sum-lengths-tr '(((b c) a) () (c d)))
+4
+&gt; (poly-eval-tr '() 5)
+0
+&gt; (poly-eval-tr '(4 3 2 1) 5)
+586
+&gt; (poly-eval-tr '(1 1 2 0) 3)
+42
+&gt; (mul-list-2 '() 5)
+'()
+&gt; (mul-list-2 '(9 3 1) 5)
+'(45 15 5)
+&gt; (sum-lengths-2 '(((((1)))) (2)))
+2
+&gt;
+$
+</pre>
+<h2>Provided Files</h2>
+<p>
+The <a href="./files">./files</a> directory contains the following:
+</p>
+<dl>
+<p><dt><a href="./files/Makefile">Makefile</a><dd>
+    This file contains a <tt>submit</tt> target such that typing <tt>make
+    submit</tt> will create a <tt>prj2.tar.gz</tt> archive containing the files
+    to be submitted. The <tt>clean</tt> target will remove the archive.
+</p>
+<p>
+    You may edit this file if you choose to use a different
+    organization for your project.  When editing, watch out for tabs
+    (the first character of any command-line <b>must be a tab
+    character</b>).
+</p>
+<p><dt><a href="./files/README">README</a><dd>
+    A template README; replace the <tt>XXX</tt> with your name, B-number and
+    email.  You may add any other information you believe is relevant
+    to your project submission.  In particular, you should document
+    the data-structure used for your word-store.
+</p>
+<p><dt>UglyRegexp <a href="./files/ugly-regexp/">Files</a><dd>
+    Code for a ugly-regexp parser for exercise 1.  It consists of
+    the following files:
+</p>
+<dl>
+<p><dt><a href="./files/ugly-regexp/parser.rkt">Parser</a><dd>
+      A skeleton file which will need to be completed by you.  It
+      contains the necessary main function to start up the program
+      well as all error handling and utility functions for parsing and
+      translation.
+</p>
+<p><dt><a href="./files/ugly-regexp/scanner.rkt">Scanner</a><dd>
+      A very crude scanner which streams delivers tokens to the parser
+      while ignoring linear whitespace.
+</p>
+<p><dt><a href="./files/ugly-regexp/errors.rkt">Errors</a><dd>
+      Trivial error reporting utility functions.
+</p>
+</dl>
+<p><dt><a href="./files/fns.rkt">fns.rkt</a><dd>
+    A file containing skeletons functions for exercises 2-12.
+</p>
+</dl>
+<h2>Hints</h2>
+<p>
+You may choose to follow the following hints (they are not by any
+means required).  They assume that you are using the project structure
+supported by the provided <a href="./files/Makefile">Makefile,</a>.
+</p>
+<p>
+You may choose to work within the <tt>drracket</tt> GUI tool or simply use
+the <tt>racket</tt> CLI.  Documentation is available from within <tt>drracket</tt>
+or from the web <a href="https://docs.racket-lang.org/">site</a>.
+</p>
+<p>
+Exercise 1 simply requires reimplementing project 1 in a different
+language and serves as an introduction to the syntax of Scheme.  The
+provided skeleton <a href="./files/ugly-regexp/parser.rkt">parser</a> is derived
+from the Java <a href="../prj1-sol/src/edu/binghamton/cs571/UglyRegexpParser.java">solution</a>.  The
+following points are worth noting:
+</p>
+<ul>
+<p><li>
+The code for <tt>term</tt> and <tt>term-rest</tt> is isomorphic to the code
+    for <tt>ugly-regexp</tt> and <tt>regexp-rest</tt> with the obvious changes.
+</p>
+<p><li>
+The code for <tt>factor</tt> will require a decision based on the kind of
+    the lookahead token.  Use a <tt>cond</tt> with calls to <tt>check?</tt>.  For
+    <tt>chars</tt>, the <tt>factor</tt> function should take care of matching the
+    <tt>CHARS</tt> token and it's parentheses, delegating the task of
+    matching one-or-more comma-separated <tt>CHAR</tt>'s to the <tt>chars</tt>
+    function.
+</p>
+<p><li>
+You will need to use <tt>string-append</tt> as illustrated in the
+    provided code for <tt>regexp-rest</tt> to build up the return'd
+    translations.
+</p>
+<p><li>
+When you need to name values for use in subsequent expressions,
+    use <tt>let</tt> to set up the bindings.
+</p>
+<p><li>
+It is worth looking at the correspondence between the provided
+    code for <tt>parse</tt>, <tt>ugly-regexp</tt> and <tt>regexp-rest</tt> and the
+    corresponding Java functions in the solution for Project 1.  This
+    will give you some idea how Java constructs map into Scheme.
+</p>
+<p><li>
+This exercise deals with I/O which is basically stateful.  Hence
+    the code is imperative and it makes sense to have a sequence
+    of Scheme expressions as can be seen in the exception-handling
+    function used within <tt>parse</tt>.  This would not be true in the
+    absence of side-effects. (Note that the code you add is still
+    not allowed to use any destructive Scheme functions).
+</p>
+<p><li>
+Note that in Scheme, the then-part and else-part of an <tt>if</tt> are
+    syntactically restricted to be a single expression; if you need
+    a sequence of expressions, then use a <tt>begin</tt> to wrap them into
+    a single expression.
+<p>
+    Note that the bodies of <tt>when</tt>, <tt>unless</tt>, <tt>lambda</tt> and the clauses
+    of a <tt>cond</tt> do not have such syntactic restrictions.  Hence it is
+    possible to have such bodies contain multiple expressions without
+    needing to wrap them within a <tt>begin</tt>.
+</p>
+</p>
+</ul>
+<p>
+The following points are worth noting for the remaining exercises:
+</p>
+<ul>
+<p><li>
+It may be a good idea to initially ignore the requirement of not
+    creating any new top-level functions. Once you have the code for a
+    particular exercise working, then you can squirrel the definitions
+    of any auxiliary functions into the body of the top-level
+    function using <tt>let</tt>, <tt>let*</tt> or <tt>letrec</tt> as appropriate.
+</p>
+<p><li>
+Almost all the exercises require recursive solutions. Hence you
+    need to clearly identify your base case's and recursive case's.
+    For the former, you will need to provide a basic solution not
+    involving any recursive calls; for the latter you will need to
+    figure out how to combine solutions from one or more recursive
+    calls into a solution to the current call.
+<p>
+    In many cases, the recursive solutions will be based on the
+    structure of the data: this is referred to as <i>structural
+    recursion</i>.
+</p>
+<ul>
+<p><li>
+A list is either <tt>'()</tt> or a pair.
+</p>
+<p><li>
+For the <tt>eval-arith</tt> function, an arith expression is either a
+        Scheme number or <tt>(add exp-1 exp-2)</tt>, ... <tt>(div exp-1 exp-2)</tt>
+        where <tt>exp-1</tt> and <tt>exp-2</tt> are themselves arith expressions.
+        So for the base case, your evaluator function needs to return
+        the evaluation of a Scheme number.  For the recursive cases,
+        all you need to do is combine the results of the recursive calls
+        to the evaluator on the subexpressions appropriately.
+</p>
+</ul>
+<p>
+    The <tt>count-occurrences</tt> function is one which requires you to
+    process a Scheme expression to an arbitrary depth.  Make sure you
+    clearly identify the base case (one of the examples provided in
+    the log should help).
+</p>
+</p>
+<p><li>
+Except for the use of <tt>expt</tt> and <tt>sqrt</tt>, your code should not need
+    the use of any Scheme library functions beyond those discussed in
+    class.
+</p>
+</ul>
+<h2>Submission</h2>
+<p>
+You will need to submit a compressed archive file <tt>prj2.tar.gz</tt> which
+contains all the files necessary to build your jar file.
+Additionally, this archive <b>must</b> contain a <tt>README</tt> file which should
+minimally contain your name, B-number, email, the status of your
+project and any other information you believe is relevant.
+</p>
+<p>
+If you are using the suggested project structure, then the provided
+<a href="./files/Makefile">Makefile</a> provides a <tt>submit</tt> target which will
+build the compressed archive for you; simply type <tt>make submit</tt>.
+</p>
+<p>
+Note that it is your responsibility to ensure that your submission is
+complete.  To test whether your archive is complete, simply unpack it
+into a empty directory and see if it runs correctly.
+</p>
+<p>
+To submit the above archive, please use blackboard by following the
+<tt>Content-&gt;Projects</tt> link.
+</p>
+</body>
+</html>

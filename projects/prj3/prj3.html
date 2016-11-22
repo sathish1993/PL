@@ -1,0 +1,210 @@
+<html>
+<head>
+<title>Project 3: Haskell Programming </title>
+</head>
+<body bgcolor="#ffffff">
+<h1 align="center">Project 3: Haskell Programming </h1>
+<p>
+<b>Due Date</b>: 11/9 by 11:59p
+</p>
+<p>
+<b>Important Reminder</b>: As per the course Academic Honesty Statement,
+cheating of any kind will minimally result in receiving an F letter
+grade for the entire course.
+</p>
+<h2>Aims of This Project</h2>
+<p>
+The aims of this project are as follows:
+</p>
+<ul>
+<p><li>
+To give you an introduction to programming in Haskell.
+</p>
+<p><li>
+To expose you programming with high-order functions.
+</p>
+<p><li>
+To get you to use lazy evaluation and infinite data structures.
+</p>
+</ul>
+<h2>Project Specification</h2>
+<p>
+You are required to submit a <tt>prj3.tar.gz</tt> archive which contains a
+file <tt>prj3-sol.hs</tt> which can be run using the ghci implementation of
+Haskell on <tt>remote.cs</tt>.
+</p>
+<p>
+The file should implement the functions specified in the skeleton
+<a href="./files/prj3-sol.hs">file</a> provided.
+</p>
+<ul>
+<p><li>
+The file may not include any other top-level definitions.
+</p>
+<p><li>
+If the specification says that recursion is not allowed,
+    then your implementation must not directly use recursion.
+</p>
+</ul>
+<h2>Example Log</h2>
+<p>
+The following provides an edited log of interaction with the code
+submitted with this project:
+</p>
+<pre>
+$ ghci
+GHCi, version 7.4.1: http://www.haskell.org/ghc/  :? for help
+Loading package ghc-prim ... linking ... done.
+Loading package integer-gmp ... linking ... done.
+Loading package base ... linking ... done.
+Prelude&gt; :l "prj3-sol.hs"
+[1 of 1] Compiling Main             ( prj3-sol.hs, interpreted )
+Ok, modules loaded: Main.
+*Main&gt; quadraticRoots 2 5 2
+(-0.5,-2.0)
+*Main&gt; quadraticRoots 5 6 1
+(-0.2,-1.0)
+*Main&gt; take 10 $ iterateFunction (\x-&gt;x+1) 0
+[0,1,2,3,4,5,6,7,8,9]
+*Main&gt; take 5 $ iterateFunction (\x-&gt;x*x) 2
+[2,4,16,256,65536]
+*Main&gt; take 10 $ multiples 3
+[0,3,6,9,12,15,18,21,24,27]
+*Main&gt; take 10 $ multiples (-3)
+[0,-3,-6,-9,-12,-15,-18,-21,-24,-27]
+*Main&gt; take 15 $ hailstones 3
+[3,10,5,16,8,4,2,1,4,2,1,4,2,1,4]
+*Main&gt; take 15 $ hailstones 7
+[7,22,11,34,17,52,26,13,40,20,10,5,16,8,4]
+*Main&gt; hailstonesLen 3
+8
+*Main&gt; hailstonesLen 7
+17
+*Main&gt; hailstonesLen 77031
+351
+*Main&gt; sumAbsDiffs []
+0
+*Main&gt; sumAbsDiffs [2]
+0
+*Main&gt; sumAbsDiffs [1..5]
+4
+*Main&gt; sumAbsDiffs [1, 3, -5, 5]
+20
+*Main&gt; distances (0, 0) []
+[]
+*Main&gt; distances (0, 0) [(1, 1), (0, 2), (3, 4)]
+[1.4142135623730951,2.0,5.0]
+*Main&gt; sumLengths []
+0.0
+*Main&gt; sumLengths [(0, 0)]
+0.0
+*Main&gt; sumLengths [(0, 0), (0, 2), (3, 6)]
+7.0
+*Main&gt; sumLengths [(0, 0), (0, 2), (3, 6), (0, 2)]
+12.0
+*Main&gt; occurrences "twas brillig and the slithy toves" 't'
+[0,17,24,28]
+*Main&gt; occurrences "twas brillig and the slithy toves" 'x'
+[]
+*Main&gt; foldTree (\t1 t t2-&gt;t1 + 3*t + t2) (\x-&gt;x*2) (Leaf 5)
+10
+*Main&gt; foldTree (\t1 t t2-&gt;t1 + 3*t + t2) (\x-&gt;x*2) (Tree (Leaf 3) 2 (Leaf 4))
+20
+##Typed on single line
+*Main&gt; foldTree (\t1 t t2-&gt;t1 + 3*t + t2) (\x-&gt;x*2)
+          (Tree (Leaf 5) 3 (Tree (Leaf 3) 2 (Leaf 4)))
+39
+*Main&gt; flattenTree (Leaf 5)
+[5]
+*Main&gt; flattenTree  (Tree (Leaf 5) 3 (Tree (Leaf 3) 2 (Leaf 4)))
+[5,3,3,2,4]
+##Typed on single line
+*Main&gt; flattenTree  (Tree (Leaf [5]) [3]
+                          (Tree (Leaf [3, 2]) [1, 2] (Leaf [4, 5])))
+[[5],[3],[3,2],[1,2],[4,5]]
+##Typed on single line
+*Main&gt; catenateTreeLists  (Tree (Leaf [5]) [3]
+                                (Tree (Leaf [3, 2]) [1, 2] (Leaf [4, 5])))
+[5,3,3,2,1,2,4,5]
+##Typed on single line
+*Main&gt; catenateTreeLists  (Tree (Leaf "twas ") "brillig "
+                          (Tree (Leaf "and ") "the slithy " (Leaf "toves")))
+"twas brillig and the slithy toves"
+*Main&gt; :quit
+Leaving GHCi.
+$
+</pre>
+<h2>Provided Files</h2>
+<p>
+The <a href="./files">./files</a> directory contains the following:
+</p>
+<dl>
+<p><dt><a href="./files/Makefile">Makefile</a><dd>
+    This file contains a <tt>submit</tt> target such that typing <tt>make
+    submit</tt> will create a <tt>prj3.tar.gz</tt> archive containing the files
+    to be submitted. The <tt>clean</tt> target will remove the archive.
+</p>
+<p>
+    You may edit this file if you choose to use a different
+    organization for your project.  When editing, watch out for tabs
+    (the first character of any command-line <b>must be a tab
+    character</b>).
+</p>
+<p><dt><a href="./files/README">README</a><dd>
+    A template README; replace the <tt>XXX</tt> with your name, B-number and
+    email.  You may add any other information you believe is relevant
+    to your project submission.  In particular, you should document
+    the data-structure used for your word-store.
+</p>
+<p><dt><a href="./files/prj3-sol.hs">prj3-sol.hs</a><dd>
+    A file containing skeletons functions for the exercises.
+</p>
+</dl>
+<h2>Hints</h2>
+<p>
+You may choose to follow the following hints (they are not by any
+means required).  They assume that you are using the project structure
+supported by the provided <a href="./files/Makefile">Makefile,</a>.
+</p>
+<ul>
+<p><li>
+The solutions to many of the exercises easily fit on a single line.
+</p>
+<p><li>
+Most of the exercises require the use of higher-order functions.
+</p>
+<p><li>
+Some of the exercises can avoid the use of recursion by using functions
+    like <tt>map</tt>, <tt>foldl</tt>, <tt>foldr</tt>, or <tt>filter</tt>.
+</p>
+<p><li>
+You may use the ghci debugger; alternately, you may simply use the
+    trace
+    <a href="https://hackage.haskell.org/package/base-4.9.0.0/docs/Debug-Trace.html">https://hackage.haskell.org/package/base-4.9.0.0/docs/Debug-Trace.html</a>
+    function.
+</p>
+</ul>
+<h2>Submission</h2>
+<p>
+You will need to submit a compressed archive file <tt>prj3.tar.gz</tt> which
+contains all the files necessary to build your jar file.
+Additionally, this archive <b>must</b> contain a <tt>README</tt> file which should
+minimally contain your name, B-number, email, the status of your
+project and any other information you believe is relevant.
+</p>
+<p>
+If you are using the suggested project structure, then the provided
+<a href="./files/Makefile">Makefile</a> provides a <tt>submit</tt> target which will
+build the compressed archive for you; simply type <tt>make submit</tt>.
+</p>
+<p>
+Note that it is your responsibility to ensure that your submission is
+complete.  To test whether your archive is complete, simply unpack it
+into a empty directory and see if it runs correctly.
+</p>
+<p>
+To submit the above archive, please use blackboard by following the
+<tt>Content-&gt;Projects</tt> link.
+</p>
+</body>
+</html>

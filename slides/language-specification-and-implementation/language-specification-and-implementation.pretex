@@ -1,0 +1,1193 @@
+% -*- mode: latex -*-
+% vi: set ft=latex :
+\documentclass{beamer}
+
+%derived from beamer solution generic-ornate-15min-45min.en.tex
+
+\mode<presentation>
+{
+  \usetheme{Warsaw}
+  \setbeamercovered{transparent}
+}
+
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+\usepackage{minted}
+
+\newminted{java}{linenos}
+\newmintedfile{java}{linenos}
+
+\title[CS 571 language-specification-and-implementation]{language-specification-and-implementation}
+
+%\subtitle
+%{Presentation Subtitle} % (optional)
+
+%\author[Author, Another] % (optional, use only with lots of authors)
+%{F.~Author\inst{1} \and S.~Another\inst{2}}
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+%\institute[Universities of Somewhere and Elsewhere] % (optional, but mostly needed)
+%{
+%  \inst{1}%
+%  Department of Computer Science\\
+%  University of Somewhere
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+%\date[Short Occasion] % (optional)
+%{Date / Occasion}
+
+%\subject{Talks}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}<beamer>{Outline}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+
+\setbeamertemplate{headline}{}
+
+@begin{include_path}
+  programs/arith/src/edu/binghamton/cs571
+@end{include_path}
+
+\begin{document}
+
+%\begin{frame}
+%  \titlepage
+%\end{frame}
+
+\section{Introduction}
+
+\begin{frame}[fragile]{Language Specification Overview}
+
+A programming language is usually specified in 3 stages:
+
+ \begin{enumerate}
+\item \alert{Lexical} specification of the words or \alert{tokens} in
+  the language.  Typical languages have words which consist of
+  \textit{reserved words} like \texttt{for} and \texttt{while},
+  \textit{constant literals} like \texttt{1234}, \texttt{0x1a2c},
+  \texttt{"quoted string"}, \textit{operators} like \texttt{+},
+  \texttt{+=} and \textit{punctuation symbols} like \texttt{(},
+  \texttt{;}.
+
+
+\item \alert{Syntactic} specification of how tokens combine to form
+  \alert{phrases} in the language.  Typical phrases are
+  \textit{declarations}, \textit{statements} and 
+  \textit{expressions}.
+
+\item \alert{Semantic} restrictions on legal phrases which constitute programs, 
+as well as specifying the overall meaning of legal programs in the language.
+
+
+\end{enumerate}
+\end{frame}
+
+\section{Lexical Analysis Example}
+
+\begin{frame}[fragile]{Lexical Analysis Example}
+
+Consider the following Pascal GCD program:
+\begin{verbatim}
+{ Compute GCD of integers read from input }
+program gcd(input, output);
+var i, j : integer;
+begin
+  read(i, j);
+  while i <> j do
+    if (i > j then i:= i - j
+    else j := j -i;
+  writeln(i);
+end.
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Lexical Analysis Example}
+
+Lexical analysis will take the character stream
+constituting the above program and transform
+it into the following word or \textit{token}-stream.
+
+\begin{verbatim}
+program gcd     (       input   ,       output  
+)       ;       var     i       ,       j       
+:       integer ;       begin   read    (
+i       ,       j       )       ;       while 
+i       <>      j       do      if      i      
+>       j       then    i       :=      i
+-       j       else    j       :=      j
+-       i       ;       writeln (       i
+)       ;       end     .
+\end{verbatim}
+
+Note the removal of whitespace and comments.
+
+\end{frame}
+
+\section{Lexical Specification}
+
+\begin{frame}[fragile]{Regular Expressions}
+
+\alert{Regular expressions} (regex) are the primary method for specifying the
+lexical aspects of a programming language.
+
+ \begin{itemize}
+\item Need to define the tokens of a programming language formally.
+
+\item Regular expressions are used to specify the sequence of characters
+which constitute the tokens of a programming language.
+
+\item Regular expressions are also used in many tools like \verb@grep@ or
+programming languages like Perl for string pattern matching.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Regular Expressions Example}
+
+Natural numbers (integers $>$ 0) can be represented using:
+
+\begin{eqnarray*}
+\mbox{\it non\_zero\_digit} & \rightarrow & 
+   1\;|\;2\;|\;3\;|\;4\;|\;5\;|\;6\;|\;7\;|\;8\;|\;9\\
+\mbox{\it digit} & \rightarrow & 
+  0\;|\;\mbox{\it non\_zero\_digit} \\
+\mbox{\it natural\_number} & \rightarrow & 
+  \mbox{\it non\_zero\_digit}\;\mbox{\it digit}\,{\mbox{\tt *}}
+\end{eqnarray*}
+
+or as \verb@[1-9][0-9]*@ in most common regex syntaxes
+\end{frame}
+
+\begin{frame}[fragile]{Regular Expressions Definition}
+
+\begin{description}
+\item[Empty string:] $\epsilon$ is a RE denoting the empty string.
+
+\item[Symbol:] If $a\in\Sigma$ then \verb@a@ is a RE denoting the symbol
+$a$.
+
+\item[Concatenation:] If \verb@A@ and \verb@B@ are REs, then \verb@AB@ is a
+RE denoting the concatenation of each of the strings represented by \verb@A@
+with each of the strings denoted by \verb@B@.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Regular Expressions Definition Continued}
+
+\begin{description}
+
+\item[Alternation:] If \verb@A@ and \verb@B@ are REs, then \verb@A|B@ is a
+RE denoting any of the strings represented by \verb@A@ or by \verb@B@.
+
+\item[Kleene closure:] If \verb@A@ is a RE, then \verb@A*@ is a RE denoting
+0-or-more of the strings represented by \verb@A@.
+
+\end{description}
+
+By default, closure has the highest precedence, followed by concatenation,
+followed by alternation.  Parentheses can be used to override the default
+precedence.
+
+\end{frame}
+
+\begin{frame}[fragile]{Regular Expressions Syntactic Sugar}
+
+\begin{description}
+\item[Optional:] If \verb@A@ is a RE, then \verb@A?@ denotes an optional
+occurrence of a string denoted by \verb@A@ (equivalent to
+\verb@A|@$\epsilon$).
+
+\item[Positive Closure:] If \verb@A@ is a RE, then \verb@A+@ denotes
+one-or-more occurrences of the strings denoted by \verb@A@ (equivalent to
+\verb@AA*@).
+
+\item[Character Set:] If $x_1$, $x_2$, $x_3$ $\ldots\in \Sigma$, then
+\verb@[@$x_1x_2x_3\ldots$\verb@]@ denotes any one of the symbols $x_1$,
+$x_2$, $x_3$ $\ldots$.
+
+\end{description}
+
+Note that \verb@+@ and \verb@*@ are also referred to as \alert{greedy
+  quantifiers}; they are \textit{greedy} in that they match as much as
+possible without preventing the rest of the regex from matching.
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Regular Expressions Syntactic Sugar Continued}
+
+\begin{description}
+
+\item[Character Set Range:] If $x_i$ and $x_j$ belong to the ordered vocabulary
+$\Sigma$, then \verb@[@$x_i$\verb@-@$x_j$\verb@]@ denotes any one of the
+symbols between $x_i$ and $x_j$ (inclusive bounds).
+
+\item[Negated Character Set:] If \verb@[@$\ldots$\verb@]@ is a
+character-set, then \verb@[^@$\ldots$\verb@]@ denotes all those characters
+in $\Sigma$ which are not in \verb@[@$\ldots$\verb@]@.
+
+\end{description}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Regular Expression Examples}
+
+\begin{itemize}
+
+\item \verb@while@ is a RE denoting the token {\bf while}.
+
+\item \verb@[0-9]+@ is a RE denoting non-negative integers.
+
+\item \verb@[1-9][0-9]*|0@ is a RE denoting non-negative integers without any
+non-significant leading zeros.
+
+\item \verb@[-+]?[0-9]+@ is RE denoting a optionally-signed integer.
+
+\item \verb@[_a-zA-Z][_a-zA-Z0-9]*@ is a RE denoting a C identifier.
+
+\end{itemize}
+
+\end{frame}
+
+\section{Lexical Implementation}
+
+\begin{frame}[fragile]{Scanners}
+
+\begin{itemize}
+
+\item A \alert{scanner} is a program which transforms a
+  \textit{character-stream} into a \textit{token-stream} while
+  (usually) removing non-significant whitespace and comments.
+
+\item A \alert{token} usually contains 2 essential fields: a token
+  \textit{type} or \textit{kind} like \texttt{identifier},
+  \texttt{int\_constant}, \texttt{add\_op} and a \alert{lexeme} containing 
+  the text of word like \texttt{var\_name}, \texttt{123}, \texttt{+}.
+
+\item A scanner may be written by hand but is often automatically
+  generated using programs called \alert{scanner generators}.
+  Examples of typical scanner generators are \texttt{lex} and
+  \texttt{flex}.  Scanner generators are constructed using the theory
+  of \alert{finite automata} (beyond the scope of this course).
+
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Practical Regular Expressions}
+
+Most current programming languages have regular expressions available
+as part of the language or as part of the standard language library.
+
+\begin{itemize}
+
+\item Most modern languages use a syntax for regular expressions first
+popularized by Perl referred to as \alert{Perl Compatible Regular Expressions} or simply PCRE.
+
+\item Most syntaxes have extensions well beyond those described in
+  these transparencies like non-greedy (\verb@*?@ and \verb@+?@) and
+  possessive (\verb@*+@ and \verb@++@)quantifiers, capturing groups
+  (using parentheses).
+
+\item Many languages allow regex literals like \verb@/[a-zA-Z_][0-9a-zA-Z_]/@.
+
+\item Languages like Java which represent regex using strings suffer
+  from \alert{backslashitis}.  For example, the regex \verb@\\@ is
+  represented using the string literal \verb@"\\\\"@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Keywords versus Reserved Words}
+
+\begin{itemize}
+
+\item Most modern languages use {\em reserved words} which are usually
+  alphabetical words which are {\bf reserved} for denoting specific program
+  constructs and cannot be used as identifiers denoting variables or
+  functions.
+
+\item Some languages like PL/I use {\em keywords} which denote specific
+  program constructs only within specific contexts.  In other contexts, they
+  may be used as general identifiers denoting variables or functions.
+
+\item Keywords allow easy language-subsetting, but complicate implementation.
+
+\end{itemize}
+
+
+\end{frame}
+
+\section{Syntax Analysis}
+
+\begin{frame}[fragile]{Syntax Analysis}
+
+\alert{Syntax analysis} takes a token-stream (from lexical analysis) and
+extracts a phrase structure from the stream.  The extracted structure is
+often represented as a \alert{tree}
+
+\end{frame}
+
+\begin{frame}[fragile]{GCD Structure Tree}
+\begin{figure}
+\includegraphics[width=80mm]{figs/1-04}
+\end{figure}
+
+\end{frame}
+
+\section{Syntax Specification}
+
+\begin{frame}[fragile]{Regex Not Enough to Specify Syntax}
+
+\begin{itemize}
+
+\item Regular expressions cannot be used to specify nested constructs used
+in most programming languages.  For example, expressions can contain nested
+expressions nested to an arbitrary depth, statements can contain nested
+statements nested to an arbitrary depth.
+
+\item Syntax is specified using \alert{Context Free Grammars} (CFGs).  Direct
+  or indirect recursion in CFG's allow specifying constructs which are
+  nested to an arbitrary depth.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{An Example Grammar}
+
+\begin{eqnarray*}
+\mbox{\it expr} & \rightarrow & 
+\mbox{id}\;|\;\mbox{number}\;|\; -\,\mbox{\it expr}\;|\;(\,\mbox{\it expr}\,)\\
+&& \mbox{\it expr}\,\mbox{\it op}\, \mbox{\it expr}\\
+\mbox{\it op} & \rightarrow & +\;|-\;|*\;|\;/
+\end{eqnarray*}
+
+Note the recursive rules where $\mbox{\it expr}$ is defined in terms of
+$\mbox{\it expr}$.
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Context Free Grammar Definition}
+
+
+A \alert{CFG} consists of a 4-tuple $\langle{\cal T}, {\cal N}, {\cal R},
+S\rangle$ where
+
+\begin{description}
+
+\item[$\cal T$] is a set of terminal symbols.
+
+\item[$\cal N$] is a set of non-terminal symbols
+with ${\cal T}\cap {\cal N} = \emptyset$.
+
+\item[$\cal R$] is a set of production
+  rules consisting of pairs
+  $\langle\;n\in {\cal N}, ({\cal N}\cup {\cal T})*\;\rangle$.
+
+\item[$S$] is a distinguished start-symbol belonging to $\cal N$.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Context Free Grammar Definition Continued}
+
+For the previous grammar, $T = \{+, -, *, /, \mbox{id}, \mbox{number}\}$, $N
+= \{\mbox{\it expr}, \mbox{\it op}\}$, $S = \mbox{\it expr}$ and $R$ is the
+set of pairs:
+
+\[
+\begin{array}{l}
+\langle\;\mbox{\it expr}, \mbox{id}\;\rangle\\
+\langle\;\mbox{\it expr}, \mbox{number}\;\rangle\\
+\langle\;\mbox{\it expr}, -\mbox{\it expr}\;\rangle\\
+\langle\;\mbox{\it expr}, (\,\mbox{\it expr}\,)\;\rangle\\
+\langle\;\mbox{\it expr},
+  \mbox{\it expr}\,\mbox{\it op}\, \mbox{\it expr}\;\rangle\\
+\langle\;\mbox{\it op}, +\;\rangle\\
+\langle\;\mbox{\it op}, -\;\rangle\\
+\langle\;\mbox{\it op}, *\;\rangle\\
+\langle\;\mbox{\it op}, /\;\rangle
+\end{array}
+\]
+
+\begin{eqnarray*}
+\mbox{\it expr} & \rightarrow & 
+\mbox{id}\;|\;\mbox{number}\;|\; -\,\mbox{\it expr}\;|\;(\,\mbox{\it expr}\,)\\
+&& \mbox{\it expr}\,\mbox{\it op}\, \mbox{\it expr}\\
+\mbox{\it op} & \rightarrow & +\;|-\;|*\;|\;/
+\end{eqnarray*}
+
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Derivations}
+
+Starting with the start symbol, repeatedly replace a non-terminal with the
+RHS of some rule for that non-terminal, until we have only terminal symbols.
+
+\begin{eqnarray*}
+\mbox{\it expr}&\Rightarrow&\mbox{\it expr}\;\mbox{\it op}\;\underline{\mbox{\it expr}}\\
+&\Rightarrow&\mbox{\it expr}\;\underline{\mbox{\it op}}\;\mbox{id }\\
+&\Rightarrow&\underline{\mbox{\it expr}}\;+\;\mbox{id }\\
+&\Rightarrow&\mbox{\it expr}\;\mbox{\it op}\;\underline{\mbox{\it expr}}\;+\;\mbox{id }\\
+&\Rightarrow&\mbox{\it expr}\;\underline{\mbox{\it op}}\;\mbox{id}\;+\;\mbox{id }\\
+&\Rightarrow&\underline{\mbox{\it expr}}\;*\;\mbox{id}\;+\;\mbox{id }\\
+&\Rightarrow&\mbox{id}\;*\;\mbox{id}\;+\;\mbox{id }
+\end{eqnarray*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Derivations Continued}
+
+\begin{itemize}
+\item $\Rightarrow$ represents a single step in the derivation; 
+$\Rightarrow\!\!*$ represents 0-or-more steps in the derivation.
+ 
+\item If we replace the {\em right-most} ({\em left-most}) non-terminal at
+each step, we have a {\em right-most} ({\em left-most}) derivation.
+
+\item Each intermediate form is called a \alert{sentential form}.
+
+\item The final sentential form is the \alert{yield} of the derivation which
+is a {\em sentence} of the language.
+
+\item The \alert{language} defined by a grammar is the set of all terminal
+sentential forms derived from the start symbol: ${\cal L} = \{x \in {\cal
+T}\!\!*\;|\;S\,\Rightarrow\!\!*\,x\}$.
+
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Parse Trees}
+
+\begin{itemize}
+
+\item A \alert{parse tree} is a graphical representation of a derivation.
+
+\item Root of parse tree is start symbol.
+
+\item If $A \Rightarrow \alpha$ is a derivation step, then add each symbol
+in $\alpha$ as the children of the node corresponding to $A$.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Example Parse Tree}
+
+\begin{center}
+\includegraphics[width=100mm]{figs/fig_2-01.jpg}\\
+Parse Tree for \verb@slope*x + intercept@.
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{Alternate Parse Tree}
+
+
+\begin{center}
+\includegraphics[width=100mm]{figs/fig_2-02.jpg}\\
+Alternate Parse Tree for \verb@slope*x + intercept@.
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{Ambiguous Grammars}
+
+\begin{itemize}
+
+\item A grammar is \alert{ambiguous} if there is a sentence derived by
+  the grammar which has multiple parse trees.
+
+\item Ambiguous grammars are not useful for specifying the \alert{concrete
+  syntax} of programming languages.
+
+\item Transform grammar to remove ambiguity; alternatively, some parsers
+allow specifying {\em disambiguation rules}.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Associativity and Precedence}
+
+\begin{itemize}
+
+\item Binary operator $\otimes$ is \alert{left-associative} if
+  $a\otimes b \otimes c = (a\otimes b) \otimes c$.
+
+\item Binary operator $\otimes$ is \alert{right-associative} $a\otimes
+  b \otimes c = a\otimes (b \otimes c)$.
+
+\item Binary operator $\otimes$ has \alert{precedence} over binary operator
+$\oplus$ if $a\otimes b \oplus c = (a\otimes b) \oplus c$ and $a\oplus
+b\otimes c = a\oplus (b\otimes c)$.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Arithmetic Associativity and Precedence}
+
+Usual arithmetic associativity and precedence:
+
+\begin{itemize}
+
+\item Lowest precedence left-associative \verb@+@ and \verb@-@; then
+  left-associative \verb@*@ and \verb@/@; then unary minus; right
+  associative \verb@**@ or \verb@^@ (for exponentiation) has highest
+  precedence.  Overriden by parentheses.
+
+\item Exceptions: In APL, all operators have equal precedence and are
+evaluated right-to-left.  In Microsoft Excel and Unix \verb@bc@, unary minus
+has higher precedence than exponentiation, i.e. 
+\verb@-2^2@ $=$ \verb@(-2)^2@ $=$ \verb@4@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Enforcing Associativity/Precedence via Grammar}
+
+\begin{itemize}
+
+\item Introduce extra non-terminals for each precedence level.
+
+\item Have lower-precedence operators higher in grammar (closer to the start
+symbol).
+
+\item For left-associative (right-associative) operators use left-recursive
+(right-recursive) rules.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Transformed Grammar for Arithmetic Expressions}
+
+  Use non-terminal $\mbox{\it expr}\;$ for $\mbox{\tt +}$, $\mbox{\tt
+    -}$ level; non-terminal $\mbox{\it term}\;$ for $\mbox{\tt *}$,
+  $\mbox{\tt /}$ level; non-terminal $\mbox{\it factor}\;$ for
+  primitives ($\mbox{number}$, $\mbox{id}$), unary-minus or
+  parenthesized expressions.
+
+\begin{eqnarray*}
+\mbox{\it expr}&\rightarrow&
+  \mbox{\it term}\;\;|\;\;\mbox{\it expr}\;\mbox{\it add\_op}\;\mbox{\it term}\\
+\mbox{\it term}&\rightarrow&
+  \mbox{\it factor}\;\;|\;\;\mbox{\it term}\;\mbox{\it mult\_op}\;\mbox{\it factor}\\
+\mbox{\it factor}&\rightarrow&
+\mbox{id}\;\;|\;\;\mbox{number}\;\;|\;\;-\;\mbox{\it factor}\;\;|\;\;(\;\mbox{\it expr}\;)\\
+\mbox{\it add\_op}&\rightarrow&\mbox{\tt +}\;\;|\;\;\mbox{\tt -}\\
+\mbox{\it mult\_op}&\rightarrow&\mbox{\tt *}\;\;|\;\;\mbox{\tt /}
+\end{eqnarray*}
+
+Ignored exponentiation operator.
+
+\end{frame}
+
+\begin{frame}[fragile]{Precedence Parse Tree}
+
+\begin{center}
+\includegraphics[width=100mm]{figs/fig_2-03.jpg}\\
+Parse Tree for \verb@3+4*5@.
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{Associative Parse Tree}
+
+\begin{center}
+\includegraphics[width=100mm]{figs/fig_2-04.jpg}\\
+Parse Tree for Left-Associative \verb@10-4-3@.
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{Abstract Syntax Tree}
+
+\alert{Abstract Syntax Tree}: Extract interesting structure of tree by
+removing intermediate grammar symbols:
+
+\begin{center}
+\begin{verbatim}
+                +
+               / \
+              /   \
+              3   *
+                 / \
+                /   \
+                4   5
+\end{verbatim}
+AST for \verb@3 + 4 * 5@.
+\end{center}
+
+Can be represented linearly using Lisp S-expression
+\verb@(+ 3 (* 4 5))@ or Prolog term \verb@+(3, *(4, 5))@.
+
+\end{frame}
+ 
+\section{Syntax Implementation}
+
+\begin{frame}[fragile]{Parsers}
+
+\begin{itemize}
+
+\item A \alert{parser} is a program which given a {\em token stream} and a CFG
+produces (explicitly or implicitly) a {\em parse tree} or {\em AST}.
+
+\item Many parsers are \alert{top-down} (write start-symbol to terminals) or
+\alert{bottom-up} (write terminals to start-symbol).
+
+\item Parsers are usually constructed by parser generators like
+  \verb@yacc@, \verb@bison@ (bottom-up generators which generates C),
+  \verb@javacc@, \verb@antlr@ (top-down generators which generates
+  java).
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Parsing}
+
+Not strictly relevant to this course, but a very useful technique to
+know.
+
+\begin{itemize}
+
+  \item Recursive-descent is a simple way of writing parsers manually.
+
+  \item A recursive-descent parser is a \textit{top-down} parser which
+    \textit{descends} into derivation using a set of
+    mutually-\textit{recursive} functions.
+
+  \item Structure of recursive-descent parsing program mirrors
+    CFG.
+
+    \item Rather severe restrictions on class of CFG's which can be
+      handled using this technique.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Parsing Details}
+
+\begin{itemize}
+
+\item Initialize a global \verb@lookahead@ to contain the current
+  \alert{lookahead token} from the scanner.
+
+\item Have a \verb@match(t)@ function which ensures that the current
+lookahead matches token \verb@t@ and advances the lookahead to the next
+token.  If the lookahead does not match \verb@t@, then signal a syntax
+error.
+
+\item For each non-terminal in grammar have a corresponding function whose
+specification requires it to recognize a prefix of the input which
+corresponds to one of the rules for that non-terminal.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Parsing Details Continued}
+
+\begin{itemize}
+
+\item For each non-terminal function use the current lookahead to select
+the appropriate rule.  
+
+
+\item For each rule with RHS containing sequence of symbols $\alpha$,
+  process each symbol in order:
+
+\begin{itemize}
+
+\item If the symbol is a terminal symbol \verb@t@ then call \verb@match(t)@.
+
+\item If the symbol is a non-terminal symbol \verb@A@ then call the
+function \verb@A()@ corresponding to \verb@A@.
+
+\end{itemize}
+
+\end{itemize}
+
+Easy to prove correctness (use an inductive argument with inductive
+hypothesis that each parsing function meets its specification for a
+smaller input).
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Example}
+
+Consider following grammar for a list of comma-separated \verb@ID@'s
+terminated by a \verb@;@.
+\begin{verbatim}
+idList
+  : ID idListTail
+  ;
+idListTail
+  : ',' ID idListTail
+  | ';'
+  ;
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Example Continued}
+
+Following program:
+
+\begin{verbatim}
+Token lookahead;
+void idList() {
+  match(ID); idListTail();
+}
+void idListTail() {
+  if (lookahead.kind == ',') {
+    match(','); match(ID); idListTail();
+  }
+  else {
+    match(';');
+  }
+}
+\end{verbatim}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Recursive Descent Problems}
+
+Consider fragment of arithmetic expression grammar:
+
+\begin{verbatim}
+expr
+  : expr '+' term
+  | term
+
+void expr() {
+  if (...) {
+    expr(); match('+'); term();
+  }
+  else {  term();  }
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Recursive Descent Problems Continued}
+
+\begin{itemize}
+
+\item What is the test \verb@(...)@ in \verb@if (...)@.  
+
+\item \verb@expr()@ calls
+\verb@expr()@ directly without changing lookahead $\ldots$ infinite loop!!
+
+\item Recursive-descent parsers cannot handle CFG's with
+  left-recursive (direct or indirect) rules.
+
+\item Show-stopper?
+ 
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Coping with Left-Recursion}
+
+  Since recursive-descent parsers cannot cope with left-recursive
+  grammars try transforming grammar to one without left-recursive
+  rules but which describes the same language.
+  
+Consider
+
+\begin{verbatim}
+expr
+  : expr '+' term
+  | term
+\end{verbatim}
+
+\verb@expr@ must start with a \verb@term@.  This may be followed by
+0-or-more occurrences of \verb@'+' term@.
+
+\end{frame}
+
+\begin{frame}[fragile]{Coping with Left-Recursion Continued}
+
+\begin{verbatim}
+expr
+  : term exprRest
+  ;
+exprRest
+  : '+' term exprRest
+  | /* empty */
+  ;
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Grammar for Arithmetic Expressions}
+
+  Motivation: extended example of parsing arithmetic expressions using
+  recursive-descent parsing.
+
+  Start with a grammar for arithmetic expressions which enforces
+  associativity and precedence (very similar to previous grammar).
+  
+\begin{verbatim}
+  program
+    :  EOF
+    |  expr '\n' program
+    ;
+  expr
+    :  expr '+' term
+    |  expr '-' term
+    |  term
+    ;
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Grammar for Arithmetic Expressions Continued}
+
+\begin{verbatim}
+  term
+    :  term '*' factor
+    |  term '/' factor
+    |  factor
+    ;
+  factor
+    :  simple '**' factor
+    |  simple
+    ;
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Grammar for Arithmetic Expressions Continued}
+
+\begin{verbatim}
+  simple
+    : '-' simple
+    |  INTEGER
+    |  '(' expr ')'
+    ;
+\end{verbatim}
+
+This grammar has unary minus with higher precedence than exponentiation.
+
+\end{frame}
+
+\begin{frame}[fragile]{Transformed Grammar for Extended Recursive-Descent Example}
+
+\begin{verbatim}
+  program
+    :  EOF
+    |  expr '\n' program
+    ;
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Transformed Grammar for Extended Recursive-Descent Example Continued}
+
+\begin{verbatim}
+  expr
+    :  term exprRest
+    ;
+  exprRest
+    :  '+' term exprRest
+    |  '-' term exprRest
+    |  //EMPTY
+    ;
+\end{verbatim}
+
+\verb@//EMPTY@ is a comment denoting that the rule matches the empty string
+$\epsilon$.
+
+\end{frame}
+
+\begin{frame}[fragile]{Transformed Grammar for Extended Recursive-Descent Example Continued}
+
+\begin{verbatim}
+  term
+    :  factor termRest
+    ;
+  termRest
+    :  '*' factor termRest
+    |  '/' factor termRest
+    |  //EMPTY
+    ; 
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Transformed Grammar for Extended Recursive-Descent Example Continued}
+
+\begin{verbatim}
+  factor
+    :  simple '**' factor
+    |  simple
+    ;
+  simple
+    : '-' simple
+    |  INTEGER
+    |  '(' expr ')'
+    ;
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Expression Evaluation Log}
+\begin{verbatim}
+$ java -cp target/arith.jar \
+      edu.binghamton.cs571.ArithParser
+1 + 2 * 3
+7
+(1 + 2) * 3
+9
+2 * 3**3 * -2
+-108
+64 / 2**3 / 2
+4
+64 / (2**3 / 2)
+16
+1 + - 2
+-1
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Expression Evaluation Log Errors}
+\begin{verbatim}
+1 + + 2
+<stdin>:7:4: syntax error at '+'
+1 ( 2 )
+1
+<stdin>:8:2: syntax error at '('
+1 @ 2
+1
+<stdin>:9:2: syntax error at '@'
+$
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Evaluating Arithmetic Expressions using Recursive-Descent}
+
+\begin{itemize}
+
+\item Have each function corresponding to an expression non-terminal
+return the value of that expression.
+
+\item The functions for non-terminals like \verb@exprRest@ and \verb@termRest@
+introduced for left-recursion removal will have an input parameter which
+will accumulate the value of the expression/term seen previously.
+
+\item When the function for non-terminals like \verb@exprRest@ and
+\verb@termRest@ recognized the empty sequence, they should use the input
+parameter as the return value.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: Token Types}
+
+In file \href{./programs/arith/src/edu/binghamton/cs571/ArithParser.java}{ArithParser.java}:
+
+@pre{javafile}[begintag=@tokenKind@,endtag=@tokenMap@]{ArithParser.java}
+
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: Token Map}
+Scanner in
+ \href{./programs/arith/src/edu/binghamton/cs571/Scanner.java}{Scanner.java}:
+
+@pre{javafile}[begintag=@tokenMap@,endtag=@main@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: ArithParser Class}
+@pre{javafile}[begintag=@arithParser@,endtag=@program@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{program()}}
+@pre{javafile}[begintag=@program@,endtag=@program1@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{program()} Continued}
+@pre{javafile}[begintag=@program1@,endtag=@expr@]{ArithParser.java}
+\end{frame}
+
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{expr()}}
+@pre{javafile}[begintag=@expr@,endtag=@exprRest@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{exprRest()}}
+@pre{javafile}[begintag=@exprRest@,endtag=@exprRest1@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{exprRest()} Continued}
+@pre{javafile}[begintag=@exprRest1@,endtag=@term@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{term()}}
+@pre{javafile}[begintag=@term@,endtag=@termRest@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{termRest()}}
+@pre{javafile}[begintag=@termRest@,endtag=@termRest1@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{termRest()} Continued}
+@pre{javafile}[begintag=@termRest1@,endtag=@factor@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{factor()}}
+@pre{javafile}[begintag=@factor@,endtag=@simple@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{simple()}}
+@pre{javafile}[begintag=@simple@,endtag=@simple1@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{simple()} Continued}
+@pre{javafile}[begintag=@simple1@,endtag=@exception@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{match()}}
+@pre{javafile}[begintag=@match@,endtag=@syntaxError@]{ArithParser.java}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive-Descent Program: \texttt{syntaxError()}}
+@pre{javafile}[begintag=@syntaxError@,endtag=@nextToken@]{ArithParser.java}
+\end{frame}
+
+
+\section{Semantics}
+
+\begin{frame}[fragile]{Semantic Language Restrictions}
+
+\begin{itemize}
+
+\item CFG's cannot describe many aspects of programming languages: for example, a variable can only be used after it is declared; the number of parameters of a function call must agree with the function declaration.
+
+\item What ever cannot be described by the syntax is lumped into \alert{semantic restrictions}.
+
+\item There are some formal frameworks like \alert{attribute grammars} for checking semantics.  In practice, ad-hoc techniques are usually used.
+
+\item Once a program meets all lexical, syntax and semantic restrictions, it is known to be correct.
+
+\item In a compiler, the task of analyzing a program to ensure that it
+  meets lexical, syntactic and semantic restrictions is done by the
+  \alert{front-end}.  The \alert{back-end} is responsible for
+  generating code.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Semantic Specification}
+
+There are various methods for describing the semantics of a programming 
+language (different from the more implementation-oriented semantic checking):
+
+\begin{description}
+
+\item[Natural Language Description] A language definition manual
+  attempts to describe the programming language using a natural
+  language like English.  The description attempts to be as precise as
+  possible, but there are often ambiguities and inconsistencies.  In
+  practice, this is the most common technique.  An example is the
+  \href{https://docs.oracle.com/javase/specs/}{Java Language
+    Specification}.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Semantic Specification Continued}
+
+\begin{description}
+
+\item[Operational Semantics] There is a canonical implementation of
+  the programming language and the language is defined by this
+  implementation.  This means that bugs in the implementation are part
+  of the language specification.  More importantly, it is not clear
+  which aspects of the specification are essential and which result
+  from accidental implementation details.  In practice, quite a few
+  languages have been defined this way, with Perl being a exemplar.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Semantic Specification Continued}
+
+\begin{description}
+\item[Denotational Semantics] The language is described using
+  mathematical functions.  Not terribly popular because the
+  description is complex and inaccessible to most users of the
+  programming language.  Suited to the languages which have more
+  mathematical backgrounds like the functional and logic programming
+  languages.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}{References}
+
+Text, Chapters 1; Chapter 2 through 2.3.1 omitting 2.2
+
+\end{frame}
+
+\end{document}
+
+

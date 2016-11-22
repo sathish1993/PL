@@ -1,0 +1,390 @@
+\documentclass[12pt]{article}
+%\usepackage{html}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\title{CS 571\\Midterm Solution}
+%\addtolength{\topmargin}{-2cm}
+%\addtolength{\topskip}{-2cm}
+%\addtolength{\oddsidemargin}{-2cm}
+%\addtolength{\evensidemargin}{-2cm}
+%\addtolength{\textheight}{2cm}
+%\addtolength{\textwidth}{2cm}
+%\addtolength{\footskip}{-1cm}
+\date{}
+\begin{document}
+\maketitle
+
+\begin{flushleft}
+\textbf{Oct 24}\\
+\textbf{100 points}\hfill\textbf{Open book, open notes}\\
+\textbf{Time}: 85 minutes\hfill\textbf{No Electronic Devices}\\
+
+\vspace{0.5cm}
+
+\textbf{Important Reminder}: As per the course Academic Honesty
+Statement, cheating of any kind will minimally result in receiving an
+F letter grade for the entire course.
+
+\textbf{Justify all answers}
+
+Please write your answers only within the provided exam booklets.
+
+\end{flushleft}
+
+There are a total of 6 questions.
+
+\begin{enumerate}
+
+\item A Unix \textit{path} is defined in stages as follows:
+
+  \begin{description}
+  \item[\textbf{Path Component}]
+    A \textit{path component} is a sequence of one-or-more
+  characters which does not contain any occurrences of the \verb@/@ or
+  \verb@NUL@ characters.
+\item[\textbf{Relative Path}] A \textit{relative path} is a sequence
+  of one-or-more path components separated by a single \verb@/@
+  character.
+\item[\textbf{Absolute Path}]
+  An \textit{absolute path} consists of the \verb@/@ character
+  optionally followed by a relative path.
+\item[\textbf{Unix Path}]
+  A Unix path is either an absolute or a relative path.
+    \end{description}
+
+  Provide a regex for Unix paths.  You may use \verb@\/@ to represent
+  the regex matching \verb@/@ and \verb@\0@ to represent the regex
+  matching the \verb@NUL@ character.  You should factor (using
+  intermediate named regex's) or format your answer to ensure that
+  it is readable and understandable.
+  \hfill{\textit{10-points}}
+
+\begin{verbatim}
+
+path-component = [^\/\0]+
+rel-path = path-component ( \/ path-component )*
+abs-path = \/ rel-path?
+path = abs-path | rel-path
+\end{verbatim}  
+
+Alternately, without using any intermediate named regex's:
+\begin{verbatim}
+\/ | \/? [^\/\0]+ (\/ [^\/\0]+)*
+\end{verbatim}
+
+\item An \textit{X-expression} is either an atom, or two X-expressions
+  surrounded by parentheses and separated by \verb@.@ (period), or a
+  sequence of one-or-more X-expressions surrounded by parentheses.
+
+  \begin{enumerate}
+  \item Give a grammar for \textit{X-expressions}.  You should
+    use the set of terminals $\{$ \verb@ATOM@$,$ \verb@'('@$,$ \verb@')'@$,$
+      \verb@'.'@$\}$.
+
+  \item Use your grammar to provide a \textit{parse tree} for the
+    X-expression \verb@( (1 . 2) 3)@, where the integers will be
+    scanned as \verb@ATOM@ terminals.
+
+  \end{enumerate} \hfill\textit{20-points}
+  
+  \begin{enumerate}
+
+  \item
+\begin{verbatim}
+      x-expression
+        : ATOM
+        | '(' x-expression '.' x-expression ')'
+        | '(' list ')'
+        ;
+      list
+        : x-expression
+        | x-expression list
+        ;
+\end{verbatim}
+
+\newpage
+\item
+\begin{verbatim}
+
+                      x-expression
+                           |
+                           |
+                +--------- +----------+
+                |          |          |
+                |          |          |
+               '('        list       ')'
+                           |                
+                           |                
+                           +-------------------------+
+                           |                         |
+                           |                         |
+                      x-expression                  list
+                           |                         |          
+                           |                         |                 
+       +--------+----------+------ +---------+  x-expression
+       |        |          |       |         |       |
+       |        |          |       |         |       |
+      '('  x-expression   '.' x-expression  ')'     ATOM (3)
+                |                     |
+                |                     |
+               ATOM (1)              ATOM (2)
+\end{verbatim}
+
+  \end{enumerate}
+  \item Given the following program in a language which supports nested
+  functions as well as both lexically-scoped (indicated using a \verb@lex@
+  declaration) and dynamically-scoped variables (indicated using a
+  \verb@dyn@ declaration):
+
+\begin{verbatim}
+lex lex1 = 1;  //lexically scoped var lex1
+dyn dyn1 = 2;  //dynamically scoped var dyn1
+
+f(param_f) { //define function f with single parameter param_f
+  lex lex1 = 3; 
+  dyn dyn1 = 4;
+
+  g(param_g) { //define function g with single parameter param_g
+
+    return lambda(x) { return x + param_f*param_g + lex1*dyn1; };
+  }
+
+  return g(dyn1);
+
+}
+
+print f(6)(7);
+  
+\end{verbatim}
+
+
+What will be printed by the above program.  Please remember to justify
+your answer.  \hfill\textit{20-points}
+
+When the anonymous function is defined, the parameters and lexically
+scoped variables are bound. So at the point of definition of the
+anonymous function, we have \verb@param_f@ with value 6,
+\verb@param_g@ with value 4 (the value of \verb@dyn1@ when
+\verb@g()@ is called), and \verb@lex1@ with value 3; hence the function
+returned is:
+
+\begin{verbatim}
+      lambda(x) { return x + 6*4 + 3*dyn1; }
+\end{verbatim}
+
+When the anonymous function is run, the parameter \verb@x@ is bound to
+7 and \verb@dyn1@ is bound to its current dynamic value 2.  Hence the
+function returns \verb@7 + 6*4 + 3*2@ which is 37.  Hence 37 will be
+printed.
+
+\item Describe how you would represent a CFG using basic
+  S-expressions.
+
+\begin{enumerate}  
+  \item Specifically, describe how you would use
+  S-expressions to represent \textit{terminals},
+  \textit{non-terminals}, \textit{rules} and \textit{grammars}.
+
+  \item Show your representation for the example CFG:
+\begin{verbatim}
+s : a
+  | b
+  ;
+a : A
+  ;
+b : B
+  ;
+\end{verbatim}
+
+  \item Describe how you would hide the details of your representation from
+    users of your representation.
+
+\end{enumerate}
+\hfill\textit{15-points}
+
+\begin{enumerate}
+
+\item One possible representation:
+
+  \begin{description}
+  \item[\textbf{Terminal Symbol}] A terminal symbol $T$ would be represented
+    as the pair \verb@(term .@ $T$ \verb@)@ for some atom $T$. 
+  \item[\textbf{Non-Terminal Symbol}] A non-terminal symbol $N$ would be represented
+    as the pair \verb@(non-term .@ $N$ \verb@)@ for some atom $N$.
+  \item[\textbf{Rule}] A rule would be represented by a pair where
+    the first element of the pair is a non-terminal symbol representing the
+    LHS of the rule and the second element of the pair is a list
+    containing the symbols on the RHS of the rule.
+
+  \item[\textbf{Grammar}] A grammar would be represented by a pair
+    where the first element of the pair is a non-terminal representing
+    the start-symbol of the grammar and the second element of the pair would
+    be a list of the rules for the grammar.
+  \end{description}
+
+\item
+\begin{verbatim}
+       ((non-term . s)
+        ((non-term . s) (non-term . a))
+        ((non-term . s) (non-term . b))
+        ((non-term . a) (term . A))
+        ((non-term . b) (term . B)))  
+\end{verbatim}
+Note the simplification above by having the second element of both grammars
+and rules be lists.
+
+\item The representation would be hidden between a set of accessor
+  functions.  Using Scheme notation, we could have something like the
+  following:
+
+\begin{verbatim}
+
+;;return the symbol representing the start-symbol for the grammar
+(g-start-symbol grammar)
+
+;;return a list of rules for non-terminal symbol non-term in grammar.
+(g-rules grammar non-term)
+
+;;return the non-terminal symbol for rule.
+(g-lhs rule)
+  
+;;return a list of symbols representing the rhs of rule.
+(g-rhs rule)
+
+;;Return #f iff sym does not represent a non-terminal symbol  
+;;(non-terminal? sym)  
+  
+;;Return #f iff sym does not represent a terminal symbol  
+;;(terminal? sym)  
+  
+\end{verbatim}
+
+This would allow hiding the representation.  So the representation
+provided in part (a) could be changed to a more efficient indexed
+representation, but the use of the representation would remain
+unchanged. 
+
+\end{enumerate}
+
+\item Write a Scheme function
+  \verb@(count-atoms @\textit{s-exp}\verb@)@ which counts the number
+  of atoms (non-pairs) in a maximally simplified representation of
+  S-expression \textit{s-exp} (i.e., the \verb@'()@ terminating proper
+  lists should be ignored).
+
+Example log:
+\begin{verbatim}
+> (count-atoms 'a)
+1
+> (count-atoms '(a ()))
+2
+> (count-atoms '(a . ()))
+1
+> (count-atoms '(a b . ()))
+2
+> (count-atoms '(a b ()))
+3
+>
+\end{verbatim}  \hfill\textit{20-points}
+
+The key to this question is to decompose the \textit{s-exp}.
+
+\begin{itemize}
+
+\item If \textit{s-exp} is not a pair, then it is an atom
+  which should be counted; hence the function should return 1.
+
+\item If \textit{s-exp} is a pair, then the number of atoms
+  is the number of pairs in the \verb@car@ plus the number
+  of pairs in the \verb@cdr@.  However, when the \verb@cdr@
+  is null, then the number of pairs in the \verb@cdr@ should
+  be counted as 0.
+  
+\end{itemize}
+
+This results in the function:
+
+\begin{verbatim}
+(define (count-atoms s-exp)
+  (if (pair? s-exp)
+      (+ (count-atoms (car s-exp))
+      (let ([tail (cdr s-exp)])
+         (if (null? tail)
+             0
+             (count-atoms tail))))
+      1))
+\end{verbatim}
+
+\item Discuss the validity of the following statements:
+
+  \begin{enumerate}
+
+  \item All evaluable Scheme expressions are S-expressions.
+
+  \item All S-expressions are evaluable Scheme expressions.
+
+  \item Assuming that a stack grows towards high memory, then within a
+    stack frame for a function, the parameters to the function will be
+    located at higher addresses than the local variables of the
+    function.
+
+  \item Languages which allow recursive functions \textbf{must} use
+    stack allocation for function parameters and local variables.
+
+  \item If a language requires a left-associative binary operator $\oplus$
+    to have the same precedence as a right-associative binary operator
+    $\otimes$, then the language is ambiguous.
+
+    \end{enumerate}
+\hfill\textit{15-points}
+
+  \begin{enumerate}
+
+  \item An evaluable Scheme expression is either an atom or the
+    application of a function to zero-or-more scheme expressions, both
+    of which can be represented as S-expressions.  Hence the statement
+    is \textbf{true}.
+
+  \item Not all S-expressions are evaluable Scheme expressions because
+    an evaluable Scheme expression which is a pair requires something
+    which represents a function as the first element of the pair.  For
+    example, \verb@(1 2)@ is an S-expression but is not an evaluable Scheme
+    expression (note that \verb@'(1 2)@ which is the same as
+    \verb@(quote (1 2))@ is an evaluable Scheme expression).  Hence the
+    statement is \textbf{false}.
+
+  \item The parameters will be pushed onto the stack before the local
+    variables.  Since the stack grows towards high memory, the
+    parameters will be pushed at lower addresses than the local
+    variables.  Hence the statement is \textbf{false}.
+
+
+  \item Languages which allow recursive functions \textbf{must} use
+    stack allocation for function parameters and local variables.
+
+    Languages which allow recursive functions definitely cannot use
+    static allocation for function parameters and local
+    variables. However, instead of stack allocation, they can use heap
+    allocation for function parameters and local variables; this may
+    not be particularly efficient but will always work (in fact, this
+    may be necessary when a parameter or local variable value escapes
+    the function activation).  Hence the statement is \textbf{false}.
+
+  \item When a binary operator is left-associative, then it's
+    left-operand can contain a non-parenthesized expression with a
+    top-level operator of the same or higher precedence, whereas it's
+    right operand can contain a non-parenthesized expression with a
+    top-level operator with strictly higher precedence.  A similar
+    statement holds for a right-associative operator.
+
+    Consider $x \otimes y \oplus z$.  This expression could represent
+    either $x \otimes (y \oplus z)$ or $(x \otimes y) \oplus z$ without
+    violating the above associativity constraint.  So the same expression
+    can represent multiple syntactic structures and the language is
+    ambiguous.  Hence the statement is \textbf{true}.
+
+    \end{enumerate}
+
+\end{enumerate}
+
+\end{document}

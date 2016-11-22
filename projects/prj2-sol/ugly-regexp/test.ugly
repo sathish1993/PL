@@ -1,0 +1,5 @@
+chars(a) + chars(b)
+chars(a)*
+*chars(a, \) . chars(b)
+(chars(a) . chars(b)) + chars(c)
+chars(a) . chars(b) + chars(c)

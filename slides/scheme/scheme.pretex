@@ -1,0 +1,2001 @@
+% -*- mode: latex -*-
+% vi: set ft=latex :
+\documentclass{beamer}
+
+%derived from beamer solution generic-ornate-15min-45min.en.tex
+
+\mode<presentation>
+{
+  \usetheme{Warsaw}
+  \setbeamercovered{transparent}
+}
+
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+\usepackage{minted}
+
+\newminted{scm}{linenos}
+\newmintedfile{scm}{linenos}
+
+\newminted{c}{linenos=false}
+
+\title[CS 571: Scheme]{Scheme}
+
+%\subtitle
+%{Presentation Subtitle} % (optional)
+
+%\author[Author, Another] % (optional, use only with lots of authors)
+%{F.~Author\inst{1} \and S.~Another\inst{2}}
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+%\institute[Universities of Somewhere and Elsewhere] % (optional, but mostly needed)
+%{
+%  \inst{1}%
+%  Department of Computer Science\\
+%  University of Somewhere
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+%\date[Short Occasion] % (optional)
+%{Date / Occasion}
+
+%\subject{Talks}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}<beamer>{Outline}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+
+\setbeamertemplate{headline}{}
+
+@begin{include_path}
+  programs
+@end{include_path}
+
+\begin{document}
+
+\begin{frame}[fragile]{Where Scheme Fits In}
+
+\begin{itemize}
+
+  \item Derived from Lisp around 1975 by Sussman and Steele.  
+
+  \item One of the major changes was replacement of Lisp's dynamic scoping by
+    static scoping.
+
+  \item Small, elegant and simple language.
+
+  \item Both functional and imperative features.  To start with, we ignore
+    imperative features.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Where Scheme Fits In Continued}
+
+\begin{itemize}
+
+  \item Prefix notation.
+
+  \item Used in practical projects.  For example, it is used in implementing
+    \href{http://www.gnucash.org}{GnuCash}, the
+    \href{http://www.gnu.org/software/guile/guile.html}{Guile} extension
+    language, and as the basis for
+    \href{http://www.netfolder.com/DSSSL/}{DSSSL} stylesheet language.
+
+\end{itemize}
+    
+
+\end{frame}
+
+\begin{frame}[fragile]{Functional Programming Essentials}
+
+\begin{itemize}
+
+  \item All computation is done by evaluating functions.
+
+  \item Functions are first-class ... i.e., they may be passed to and from other
+    functions, stored in data-structures, etc.
+
+  \item No destructive assignment, i.e., something like \verb@a = a + 1@ impossible.
+    Similar to Mathematics, a variable can have only a single value.
+    Consequently, no loops!
+
+\end{itemize}
+    
+
+\end{frame}
+
+\begin{frame}[fragile]{Functional Programming Essentials Continued}
+
+\begin{itemize}
+  \item The lack of destructive assignment results in {\em referential
+    transparency}.  This means that each expression denotes a single value
+    which cannot be changed by evaluating the expression or by allowing
+    different parts of a program to share the expression.
+
+  \item Referential transparency makes it possible to reason about programs
+    using simple equality reasoning.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Non-Referentially Transparent C Code}
+
+\begin{ccode*}{}
+      int a = 1;
+
+      int f(x) {
+        a = !a;
+        return (a) ? x + 1 : x + 4;
+      }
+\end{ccode*}
+
+\begin{verbatim}
+      f(3) => 7
+      f(3) => 4
+      f(3) => 7
+      f(3) => 4
+      ...
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Scheme: Lexical Issues}
+
+\begin{itemize}
+
+\item Whitespace used to separate tokens, otherwise ignored.
+
+\item Comments extend from \verb@;@ to end-of-line.  
+
+\item All whitespace chars are \alert{delimiters}, as are:
+
+\begin{verbatim}
+           (  )  ;  "  '  `  | [  ]  {  }
+\end{verbatim}
+
+\item An \alert{identifier} is a maximal sequence of non-delimiter
+  chars that does not start with \verb@#@ or \verb@,@. Examples:
+  \verb@x@, \verb@symbol?@, \verb@set!@, \verb@<=>@.
+
+\item Case-insensitive: \verb@if@ and \verb@IF@ are equivalent.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Scheme: Syntactic Issues}
+
+\begin{itemize}
+
+\item Scheme uses prefix expressions  of the form: \verb@(@\textit{function} \textit{arg1} \textit{arg2} $\ldots$ \textit{argn}\verb@)@.
+
+\item Each \textit{argi} can be a primitive or a prefix expression.
+
+\item Basically a linearization of the AST.
+\end{itemize}
+
+\textbf{Example}: in \href{./programs/fact.scm}{programs/fact.scm}:
+
+@pre{scmfile}{fact.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{Scheme Data: Overview}
+
+\begin{itemize}
+
+\item Primitive data referred to as \alert{atom}'s.  Primitives include
+  boolean literals, number literals, character literals, string
+  literals and symbols.  The rest of this presentation largely ignores
+  non-basic numbers, characters, strings.
+
+\item Constructed data using type constructors.  The most basic
+  constructor is the \alert{pair} constructor using
+  \verb@cons@; can also have {\em vector}'s.  This presentation
+  concentrates on pair's.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Naming Conventions}
+
+A \alert{predicate} is a procedure that always returns a boolean
+value. By convention, predicates usually have names that end in
+\verb@?@.  Example: \verb@(number? x)@ which returns \verb@#t@ (representing
+\textit{true}) if its argument \verb@x@ is a number.
+
+A \alert{mutation procedure} is a procedure that alters a data
+structure. By convention, mutation procedures usually have names that
+end in \verb@!@.  Example: \verb@(set! a 22)@ destructively changes
+the value of \verb@a@ to \verb@22@.  This presentation ignores mutation 
+except to illustrate the power of closures to encapsulate state.
+
+\end{frame}
+
+\begin{frame}[fragile]{Simple Scheme Data --- Booleans}
+
+    Constants \verb@#t@ for {\em true} and \verb@#f@ for {\em false}.
+    Boolean contexts treat any value not equal to \verb@#f@ as {\em true}.
+    That is, Scheme has a single \alert{falsey value}, namely \verb@#f@.
+
+\begin{verbatim}
+    > (boolean? #f)  ;type-testing predicate.
+    #t
+    > (boolean? #t)
+    #t
+    > (boolean? 123)
+    #f
+    > (not #f)
+    #t
+    > (not 123)
+    #f
+    > 
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Simple Scheme Data --- Numbers}
+
+    {\em Unlimited} precision integers, rationals, reals,  complex.  Predicates
+    \verb@number?@, \verb@complex?@, \verb@real?@, \verb@integer?@, \verb@rational?@.  Usual arith.
+    operations; \verb@=@ for testing number equality, \verb@eqv?@ for general
+    equality.
+
+\begin{verbatim}
+    > (number? 2+3i)
+    #t
+    > (integer? 22/7)
+    #f
+    > (rational? 22/7)
+    #t
+    > (+ 1 2 3)
+    6
+    > (* 1 2 3)
+    6
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Simple Scheme Data --- Numbers Continued}
+
+\begin{verbatim}
+    > (/ 1 2 3)
+    1/6
+    > (/ 3)
+    1/3
+    > (max 22/7 3 0.6)
+    3.142857142857143
+    > (abs -1)
+    1
+    > (= 1 0)
+    #f
+    > (<= 3 3)
+    #t
+    >
+\end{verbatim}
+
+\end{frame}
+
+
+%% \begin{frame}[fragile]{Simple Scheme Data --- Characters}
+
+
+%%     Character literals represented by using \verb@#\@$c$ to represent character
+%%     $c$.  Non-graphic characters have descriptive names \verb@#\newline@,
+%%     \verb@#\space@, etc.  Predicate \verb@char?@; comparison operators \verb@char=?@,
+%%     \verb@char<?@, \verb@char<=?@, etc.; case-ignore comparison \verb@char-ci=?@,
+%%     \verb@char-ci-<?@, \verb@char-ci-<=?@, etc.; case-conversion \verb@char-upcase@,
+%%     \verb@char-downcase@.  
+
+%% \begin{verbatim}
+%%     > (char? #\t)
+%%     #t
+%%     > (char? #t)
+%%     #f
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Simple Scheme Data --- Characters Continued}
+
+%% \begin{verbatim}
+%%     > (char? #\newline)
+%%     #t
+%%     > (char=? #\a #\a)
+%%     #t
+%%     > (char=? #\a #\A)
+%%     #f
+%%     > (char-ci=? #\a #\A)
+%%     #t
+%%     > (char-downcase #\A)
+%%     #\a
+%%     >
+%% \end{verbatim}
+    
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Compound Scheme Data -- Strings}
+
+
+%%     Strings are sequences of characters.  \verb@string@ constructor
+%%     constructs a {\em string} from a sequence of characters.  Type-testing
+%%     predictate is \verb@string?@.  String literals represented within double
+%%     quotes \verb@"@ with \verb@\@ used for escapes.  The characters within a
+%%     string are indexed starting with 0.
+
+%% \begin{verbatim}
+%%     > (string? "abc")
+%%     #t
+%%     > (string? 'abc)
+%%     #f
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Compound Scheme Data -- Strings Continued}
+
+%% \begin{verbatim}
+
+%%     > (string #\a #\b #\c)
+%%     "abc"
+%%     > (string-length "abc")
+%%     3
+%%     > (string-length "\\")
+%%     1
+%%     > (string-ref "abc" 1)
+%%     #\b
+%%     > (string=? "abc" "abc")
+%%     #t
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Compound Scheme Data -- Strings Continued}
+
+%% \begin{verbatim}
+%%     > (string=? "abc" "ABC")
+%%     #f
+%%     > (string-ci=? "abc" "ABC")
+%%     #t
+%%     > (string<=? "abc" "ABC")
+%%     #f
+%%     > (string<=? "ABC" "abc")
+%%     #t
+%%     > 
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Compound Scheme Data -- Vectors}
+
+%%     Vectors are sequences of any kind of Scheme data.  \verb@make-vector@
+%%     constructs a vector out of a sequence of Scheme data.  \verb@#(@ $x_1
+%%     \ldots x_N$ \verb@)@ is a literal used for specifying a vector
+%%     containing sequence $x_1 \ldots x_N$.  \verb@#@$N$\verb@(@ ... \verb@)@
+%%     specifies a vector of exactly $N$ elements ... . Type-testing predicate
+%%     is \verb@vector?@.  Vector elements are indexed starting at index 0.
+
+%% \begin{verbatim}
+%%     > #(1 2 3)
+%%     #3(1 2 3)
+%%     > #5(1 2 3)
+%%     #5(1 2 3)
+%%     > (vector-length #5(1 2 3))
+%%     5
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Compound Scheme Data -- Vectors Continued}
+
+%% \begin{verbatim}
+%%     > (vector-length #(1 2 3))
+%%     3
+%%     > (vector-length (make-vector 10))
+%%     10
+%%     > (vector-ref (make-vector 10) 1)
+%%     0
+%%     > (vector-ref #('a "bc" #\c 2) 2)
+%%     #\c
+%%     >
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Data-Type Conversions}
+
+%% \begin{verbatim}
+%%     > (char->integer #\f)
+%%     102
+%%     > (integer->char 102)
+%%     #\f
+%%     > (string->list "cs571")
+%%     (#\c #\s #\5 #\7 #\1)
+%%     > (number->string 101)
+%%     "101"
+%%     > (number->string 101 8) ;;base 8
+%%     "145"
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}{Data-Type Conversions Continued}
+
+%% \begin{verbatim}
+%%     > (string->number "52")
+%%     52
+%%     > (string->number "52" 16)
+%%     82
+%%     > (symbol->string 'abc)
+%%     "abc"
+%%     > (string->symbol "abc")
+%%     abc
+%%     > 
+%% \end{verbatim}
+
+%% \end{frame}
+
+\begin{frame}[fragile]{Simple Scheme Data --- Symbols}
+
+
+    Normally, identifiers are used as {\em variable} names.  However, if
+    identifiers are quoted, then it is a literal representing a {\em symbol}.
+    
+\begin{verbatim}
+    > a
+    reference to undefined identifier: a
+    > (quote a)
+    a
+    > 'a
+    a
+    > '<=>
+    <=>
+\end{verbatim}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Simple Scheme Data --- Symbols Continued}
+\begin{verbatim}
+    > (symbol? '!@#$)
+    #t
+    > (symbol? 12)
+    #f
+    > (symbol? '12)
+    #f
+    > (symbol? 'e+2)
+    #t
+    > 
+\end{verbatim}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Compound Scheme Data -- Dotted Pairs}
+
+\begin{itemize}
+
+   \item A dotted pair is a record structure with two fields called
+     the {\em car} and {\em cdr} (for historical reasons), aka
+     \alert{head} and \alert{tail} respectively.
+
+  \item The pair with field \verb@car@
+    equal to $x$ and field \verb@cdr@ equal to $y$ is denoted as \verb@(@$x$
+    \verb@.@ $y$\verb@)@.  
+
+  \item Pairs are constructed using the constructor
+    \verb@cons@.  
+
+    \item The two fields are accessed using the accessor functions
+    \verb@car@ and \verb@cdr@ respectively.
+
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Compound Scheme Data -- Dotted Pairs Continued}
+
+\begin{verbatim}
+    > (cons 'a 'b)
+    (a . b)
+    > (pair? '(a . b))
+    #t
+    > (pair? 'a)
+    #f
+    > (car '(a . b))
+    a
+    > (cdr '(a . b))
+    b
+    > 
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{S-Expressions}
+
+Dotted pairs along with primitives constitute S-expressions.
+
+Specifically, a S-expression (symbolic expression) is the smallest set
+of expressions such that:
+
+\begin{itemize}
+  \item All Scheme primitives like booleans, numbers, characters, symbols,
+    strings and \verb@()@ are S-expressions.
+
+  \item If $x$ and $y$ are S-expressions, then so is the pair \verb@(cons@ $x$
+    $y$\verb@)@ denoted also as \verb@(@ $x$ \verb@.@ $y$ \verb@)@.
+
+\end{itemize}
+
+Basically, denotes binary trees with internal nodes \verb@.@ or
+\verb@cons@.  Can be used to denote any tree-like data-structure.
+
+\end{frame}
+
+\begin{frame}[fragile]{Compound Scheme Data -- Lists}
+
+
+\begin{itemize}
+
+  \item The set of Scheme lists is defined as the smallest set $L$ such that:
+
+\begin{itemize}
+      \item The empty list (denoted as \verb@()@) is in $L$.
+
+      \item Any pair whose \verb@cdr@ field contains an element of $L$ is also
+        in $L$.
+\end{itemize}
+
+  \item Examples of lists:
+
+\begin{verbatim}
+      ()
+      (a . ())
+      (a . (b . ()))
+\end{verbatim}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Compound Scheme Data -- Lists}
+
+\begin{itemize}
+  \item A simpler notation uses \verb@(a b c d)@ to denote the list
+  \verb@(a . (b . (c . (d . ()))))@.
+   
+
+  \item A chain of pairs not ending in the empty list is called an {\em
+    improper list} (it really is not a list).  For example, the improper
+    list \verb@(a . (b . (c . d)))@ can be simplified to 
+    \verb@(a b (c . d))@ but no further.
+
+
+  \item Arbitrary Scheme programs can be represented as lists; i.e., a
+    Scheme program is a Scheme datum! This means Scheme is a
+    \alert{homoiconic} language: the primary representation of a
+    program is a data-structure within the language.
+
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{List Structure}
+
+\begin{figure}
+\includegraphics[height=80mm]{figs/list}\\
+\end{figure}
+  
+\end{frame}
+
+\begin{frame}[fragile]{Improper List Structure}
+
+\begin{figure}
+\includegraphics[height=80mm]{figs/improper}\\
+\end{figure}
+  
+\end{frame}
+
+\begin{frame}[fragile]{Nested List Structure}
+
+\begin{figure}
+\includegraphics[height=80mm]{figs/nest1}\\
+\end{figure}
+  
+\end{frame}
+
+\begin{frame}[fragile]{Lists Functions}
+
+\begin{itemize}
+
+\item  Lists can be constructed using the constructor \verb@list@. Example:
+\verb@(list 1 2 3)@ results in \verb@(1 2 3)@.
+
+\item  The predicate \verb@list?@ returns \verb@#t@ iff applied to a argument which is a proper list. Examples: \verb@(list? '(1 2 3))@ results in \verb@#t@, whereas \verb@(list? '(1 2 . 3))@ results in \verb@#f@.
+
+\item List elements can be accessed by index (starting at 0) using
+  \verb@list-ref@.  Example: \verb@(list-ref '(a b c) 1)@ results in
+  \verb@b@.
+
+\item \verb@list-tail@ returns
+  the tail of a list starting at a specified index.  Example: \verb@(list-tail '(a b c) 1)@ returns \verb@(b c)@.
+
+\item The predicate \verb@null?@ recognizes the empty list.
+  Examples: \verb@(null? '())@ returns \verb@#t@ whereas \verb@(null? '(1))@
+  returns \verb@#f@.
+
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Lists Functions Continued}
+
+\begin{itemize}
+
+\item \verb@length@ returns the length of a list. Example: \verb@(length '(a b))@ returns \verb@2@.
+
+\item \verb@append@ can be used to append multiple lists. Example: \verb@(append '(a b) '(1 2) '() '(c))@ returns \verb@(a b 1 2 c)@
+
+\item \verb@member@ can be used to check whether an element is a
+  member of a list.  Examples: \verb@(member 'b '(a b c))@ returns
+  \verb@(b c)@, which is interpreted as \textit{true} within a boolean
+  context; \verb@(member 1 '(a b c))@ returns \verb@#f@.
+
+\item \verb@assoc@ is used for searching \alert{association lists}
+  which are lists of pairs, where the \verb@car@ of each pair is
+  regarded as a key.  If found, then the return value is the first
+  pair with matching key, else \verb@#f@.  Example:
+  \verb@(assoc 'b '((a 1) (b 2) (c 3)))@ returns \verb@(b 2)@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Examples}
+
+\begin{verbatim}
+    > '(a . (b . (c . d)))
+    (a b c . d)
+    > (list? '(a b))
+    #t
+    > (list? '(a (b . c)))
+    #t
+    > (list? '(a . (b . c)))
+    #f
+    > (length '(a (b . c)))
+    2
+    > (length '(a . (b . c)))
+    length: expects argument of type <proper list>; given (a b . c)
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Examples Continued}
+
+\begin{verbatim}
+    > (append '(a b c) '(1 2 3) '(x y z))
+    (a b c 1 2 3 x y z)
+    > (member 'b '(a b c))
+    (b c)
+    > (member 'x '(a b c))
+    #f
+    > 
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Contractions for Repeated \texttt{car}/\texttt{cdr}'s}
+
+\begin{itemize}
+
+\item Can use a fixed-size list to implement a record by using a particular element as a particular field.  
+
+\item An example employee record would be \verb@(@ \textit{NAME} \textit{SSN} \textit{GENDER} \textit{POSITION} \verb@)@.
+
+\item Could have accessor functions: \textit{NAME}: \verb@(car@ \textit{EMPLOYEE}\verb@)@ and \textit{POSITION}: \verb@(car (cdr (cdr (cdr@ \textit{EMPLOYEE}\verb@))))@.
+
+\item Can abbreviate \textit{POSITION}: \verb@(cadddr@ \textit{EMPLOYEE}\verb@)@.
+
+\item Most Lisp's allow reasonable number of combinations of \verb@a@'s and \verb@d@'s like \verb@cadr@, \verb@cddr@, \verb@cadar@, etc.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Functions}
+
+\begin{itemize}
+
+  \item A function is specified by a lambda expression of the form
+
+       \verb@(lambda@ {\em Params} {\em Body}\verb@)@
+
+    where {\em Params} is usually a list of identifiers specifying the
+    formal parameters of the function and {\em Body} is a S-expression
+    (which will typically contain free occurrences of the formal
+    parameters) giving the body of the function.
+
+  \item A function is given a name by assigning it to a global variable
+    using \verb@define@.
+
+    \verb@(define add1 (lambda (x) (+ x 1)))@
+
+  \item Function definition can also be abbreviated to not use
+    an explicit \verb@lambda@:
+
+    \verb@(define (add1 x) (+ x 1))@
+    
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Function Calls}
+
+\begin{itemize}
+
+  \item When a function is called, all its actual parameters are first
+    evaluated, then its body is evaluated with each free occurrence
+    of a formal in the body replaced by the actual.
+
+\begin{verbatim}
+        (add1 (* 3 2)) =>
+        ((lambda (x) (+ x 1)) (* 3 2)) =>
+        ((lambda (x) (+ x 1)) 6) =>
+        (+ 6 1) =>
+        7
+\end{verbatim}
+ 
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Special Forms}
+
+\begin{itemize}
+
+  \item A \verb@lambda@ expression looks like a function application of the
+    {\em function} \verb@lambda@, as does \verb@define@.  
+
+  \item However, when a \verb@lambda@ or \verb@define@ expression
+    is evaluated, the parameters are not evaluated.  
+
+  \item Such forms with different evaluation rules are referred to as {\em special
+    forms}.
+
+  \item Other built-in special forms include \verb@if@, \verb@when@, \verb@unless@, \verb@cond@,
+    \verb@and@, \verb@or@, etc.
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Condition Checking}
+
+\begin{itemize}
+
+  \item \verb@(if@ {\em Cond} {\em TrueExp} {\em FalseExp}\verb@)@: A
+    special form which first evaluates only {\em Cond}.  If {\em Cond}
+    evaluates to \verb@#f@, the result is the evaluation of {\em
+      FalseExp}; otherwise it is the evaluation of {\em TrueExp}.
+
+  \item \verb@(when @{\em Cond} {\em Exp}\verb@)@, \verb@(unless @{\em
+    Cond} {\em Exp}\verb@)@: Use if one of the branches of the
+    \verb@if@ is empty.
+
+   \item A multi-way \verb@if@ written as \verb@(cond [@{\em Cond1}
+     {\em Exp1}\verb@] [@{\em Cond2} {\em Exp2}\verb@]@ $\ldots$
+     \verb@[@else {\em ElseExp}\verb@])@. Each condition-expression
+     pair is referred to as a \verb@cond@-clause.
+
+   \item Syntactically, multiple expressions are allowed within
+     \verb@when@ and \verb@unless@ expressions and within a
+     \verb@cond@-clause; this is useful when the expressions have
+     side-effects.
+
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Condition Checking Examples}
+
+\begin{verbatim}
+    > (if '() 'a 'b)
+    a
+    > (if #f 'a 'b)
+    b
+    > (if (> 2 1) 'a 'b)
+    a
+    > (if (> 2 1) 'a (/ 1 0))
+    a
+    > (if (> 1 2) 'a (/ 1 0))
+    /: division by zero
+    > (unless (> 1 2) 'a)
+    a
+    > (when (> 1 2) 'a)
+    > (cond ((> 1 2) 'a) ((< 2 1) 'b) (else 'c))
+    c
+    >
+\end{verbatim}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Example --- Factorial}
+
+
+
+In \href{./programs/fact.scm}{programs/fact.scm}:
+
+@pre{scmfile}{fact.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{Factorial Log}
+
+\begin{verbatim}
+> (load "fact.scm")
+> (fact 4)
+24
+> (fact -4)
+1
+> (fact 20)
+2432902008176640000
+> (fact 100)
+933262154439441526816992388562667
+004907159682643816214685929638952
+175999932299156089414639761565182
+862536979208272237582511852109168
+64000000000000000000000000
+> 
+\end{verbatim}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Example --- List Length}
+
+
+In \href{./programs/my-length.scm}{programs/my-length.scm}:
+
+@pre{scmfile}{my-length.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Length Log}
+
+\begin{verbatim}
+> (load "my-length.scm")
+> (my-length '())
+0
+> (my-length '(a b (1 2) (a b c) d))
+5
+> (my-length 'a)
+0
+> (my-length '(a . b))
+1
+> (my-length '(a b (1 2) (a b c) d . e))
+5
+> 
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Structural Recursion}
+
+\alert{Structural recursion} \href{https://en.wikipedia.org/wiki/Structural\_induction}{is related} to the proof-method of \alert{structural induction}.  When a data-structure is defined recursively, related functions can be written using cases corresponding to the cases in the recursive definition.
+
+\begin{itemize}
+
+\item A list is either \textit{empty} or is a \textit{pair} consisting of some
+\textit{head} and some \textit{tail} which is a list.  Hence define function
+with two cases for \textit{empty} and \textit{pair}.  In the former case, return
+function value for \textit{empty} list; in the latter case, make recursive call
+for \textit{tail} and combine returned result with \textit{head} as return value
+of function.
+
+\item Recall that a non-negative integer is either 0 or the successor of
+a non-negative integer.
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Structural Recursion Continued}
+
+\begin{itemize}
+\item A non-empty array is either a 1-element array or it is a
+  1-element array followed by a non-empty array;  basing a
+  search function on this recursive definition leads to linear search.
+
+\item A non-empty array is either a 1-element array or it is a
+  sequence of two arrays of length that differ at most by 1; basing a
+  search function on this recursive definition leads to binary search.
+
+\end{itemize}
+  
+
+\end{frame}
+
+\begin{frame}[fragile]{Example --- List Length with Error Checking}
+
+
+In \href{./programs/err-length.scm}{programs/err-length.scm}:
+
+@pre{scmfile}{err-length.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Length with Error Checking Log}
+
+\begin{verbatim}
+> (load "err-length.scm")
+> (err-length '())
+0
+> (err-length '(a (b c) d))
+3
+> (err-length '(a (b c)  . d))
+"error"
+> (err-length 'a)
+"error"
+> 
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Using let}
+
+\begin{itemize}
+
+\item Allows naming of intermediate results and avoid repeated evaluation.
+
+\item Not destructive assignment: just names some value for scope
+  consisting of body of \verb@let@.
+
+  \item Example:
+
+\begin{verbatim}
+      > (let ((fact4 (fact 4))
+              (fact5 (fact 5)))
+             (+ (* fact4 fact4) 
+                (* fact5 fact5)))
+      14976
+      >
+\end{verbatim}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Sequential let}
+
+\verb@let*@ allows values of variables previously defined within the same \verb@let*@
+     to be used in subsequent definitions.
+
+\begin{verbatim}
+       > (let ((x 1) (y x)) (+ x y))
+       reference to undefined identifier: x
+       > (let* ((x 1) (y x)) (+ x y))
+       2
+       > 
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Recursive let}
+
+ \verb@letrec@ allows values of variables previously defined within the same \verb@letrec@
+     to be used in earlier definitions.
+
+\begin{verbatim}
+> (let* ([even 
+          (lambda (x) 
+            (or (equal? x 0) (odd (- x 1))))]
+         [odd 
+          (lambda (x) 
+            (and (not (equal? x 0)) 
+                 (even (- x 1))))])
+    (even 2))
+odd: undefined;
+ cannot reference undefined identifier
+ ...
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Recursive let Continued}
+
+\begin{verbatim}
+> (letrec ([even 
+             (lambda (x) (or (equal? x 0) 
+                             (odd (- x 1))))]
+           [odd 
+             (lambda (x) 
+               (and (not (equal? x 0)) 
+                    (even (- x 1))))])
+    (even 2))
+#t
+\end{verbatim}
+
+     
+\end{frame}
+
+\begin{frame}[fragile]{Example --- List Length with Error Checking Revisited}
+
+
+In \href{./programs/let-length.scm}{programs/let-length.scm}:
+                        
+@pre{scmfile}{let-length.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Length with Error Checking Revisited Log}
+
+\begin{verbatim}
+> (load "let-length.scm")
+> (let-length '())
+0
+> (let-length '(a (b . c) d))
+3
+> (let-length '(a (b  c) . d))
+"error"
+> (let-length 0)
+"error"
+>
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Example --- Appending Two Lists}
+
+
+In \href{./programs/my-append.scm>}{programs/my-append.scm}:
+
+@pre{scmfile}{my-append.scm}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Appending Two Lists Log}
+
+\begin{verbatim}
+> (load "my-append.scm")
+> (my-append '(a b c) '(1 2 3))
+(a b c 1 2 3)
+> (my-append () ())
+()
+> (my-append () '(1 2))
+(1 2)
+> (my-append () '(1 2 . 3))
+(1 2 . 3)
+> (my-append '(a . b) '(1 2 . 3))
+car: expects argument of type <pair>; given b
+> 
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Example --- Reversing a List}
+
+In  \href{./programs/my-reverse.scm>}{programs/my-reverse.scm}:
+
+@pre{scmfile}{my-reverse.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{Reversing a List Log}
+
+\begin{verbatim}
+> (load "my-reverse.scm")
+> (my-reverse '(1 2 3))
+(3 2 1)
+> (my-reverse '(a))
+(a)
+> (my-reverse '())
+()
+> (my-reverse 'a)
+cdr: expects argument of type <pair>; given a
+> (my-reverse '(a . b))
+cdr: expects argument of type <pair>; given b
+> 
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Example --- Reversing a List Revisited}
+
+Above my-reverse is $O(n^2)$ where n is the number of elements in the list.
+Can avoid $O(n^2)$ behavior by using an accumulator:
+
+In \href{./programs/lin-reverse.scm}{programs/lin-reverse.scm}
+
+@pre{scmfile}{lin-reverse.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{Reversing a List Revisited Log}
+
+\begin{verbatim}
+> (load "lin-reverse.scm")
+> (lin-reverse '(1 2 3))
+(3 2 1)
+> (lin-reverse '())
+()
+> (lin-reverse '(1))
+(1)
+> (lin-reverse '(1 (2 3 4) 5))
+(5 (2 3 4) 1)
+> 
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Accumulating Parameters}
+
+\begin{itemize}
+
+  \item A primary function is often implemented as a wrapper which
+    simply calls an auxiliary function with additional
+    accumulating parameters.  For example, \verb@reverse@ is
+    a wrapper around the auxiliary function \verb@aux-reverse@.
+
+  \item The accumulating parameter is given some initial value when the wrapper
+    calls the auxiliary function.  For example, when \verb@reverse@ calls
+    \verb@aux-reverse@, it is called with 2 parameters: an accumulating parameter
+    initialized to \verb@()@ and the original list.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Accumulating Parameters Continued}
+
+\begin{itemize}
+
+  \item As the auxiliary function recurses, the accumulating parameter for the
+    recursive call is updated (non-destructively, since the parameter for
+    the recursive call is different from the incoming parameter).  For
+    example, the recursive call to \verb@aux-reverse@ is made with the
+    accumulating parameter set to the \verb@cons@ of the \verb@car@ of the incoming
+    list being reversed and the incoming accumulating parameter.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Accumulating Parameters Continued}
+
+\begin{itemize}
+
+  \item When the auxiliary function recurses, it's return value is simply the
+    return value of the recursive call.  For example, the recursive case for
+    \verb@aux-reverse@ simply returns the return value of the recursive call.
+
+  \item When the auxiliary function terminates its recursion, the value of the
+    accumulating parameter is returned as the result.  For example, the base
+    case for \verb@aux-reverse@ simply returns the value of the accumulating
+    parameter \verb@acc@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Fibonacci Function}
+
+
+Recursive function from \href{./programs/rec-fib.scm>}{programs/rec-fib.scm}:
+
+@pre{scmfile}{rec-fib.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{Fibonacci Function Log} 
+
+\begin{verbatim}
+> (load "rec-fib.scm")
+> (rec-fib 5)
+5
+> (rec-fib 10)
+55
+> (rec-fib 20)
+6765
+>
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Fibonacci Function in C}
+
+
+Recursive and iterative functions from \href{./programs/fib.c}{fib.c}:
+
+\begin{ccode*}{}
+static int rec_fib(int n) 
+{
+  return 
+    (n < 2) ? n 
+            : rec_fib(n - 1) + rec_fib(n - 2);
+}
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Fibonacci Function in C Continued}
+
+\begin{ccode*}{}
+static int iter_fib(int n)
+{
+  if (n < 2) {
+    return n;
+  }
+  else {
+    int acc0 = 0;
+    int acc1 = 1;
+    int i;
+    for (i = 2; i <= n; i++) {
+      int t = acc0; acc0 = acc1; acc1 += t;
+    }
+    return acc1;
+  }
+}
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Accumulator Fibonacci in Scheme}
+
+
+Use additional arguments \verb@acc0@, \verb@acc1@ and \verb@i@ as in C function.
+  
+In \href{./programs/iter-fib.scm}{programs/iter-fib.scm}:
+
+@pre{scmfile}{iter-fib.scm}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Accumulator Fibonacci in Scheme: Log}
+
+\begin{verbatim}
+> (load "iter-fib.scm")
+> (iter-fib 5)
+5
+> (iter-fib 10)
+55
+> (iter-fib 20)
+6765
+> 
+\end{verbatim}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Counting All Occurrences of Non-Pairs in a List}
+
+
+\href{./programs/count-non-pairs.scm}{programs/count-non-pairs.scm}:
+
+@pre{scmfile}{count-non-pairs.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{Counting All Occurrences of Non-Pairs in a List Log}
+
+\begin{verbatim}
+> (load "count-non-pairs.scm")
+> (count-non-pairs 'a)
+1
+> (count-non-pairs '())
+1
+> (count-non-pairs '(() () () ()))
+5
+> (count-non-pairs '(1 (2 . 3) 4))
+5
+> (count-non-pairs '((a b) c () ((d (e)))))
+11
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Structure for Last Example}
+
+\begin{figure}
+\includegraphics[height=80mm]{figs/nest2}\\
+\end{figure}
+  
+\end{frame}
+
+\begin{frame}[fragile]{Flattening a List}
+
+
+\href{./programs/my-flatten.scm}{programs/my-flatten.scm}:
+
+@pre{scmfile}{my-flatten.scm}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Flattening a List Log}
+
+\begin{verbatim}
+> (load "my-flatten.scm")
+> (my-flatten '(a (b) (c d ()) e ((f) g)))
+(a b c d () e f g)
+> (my-flatten '( () ((())) ((()) ())))
+(() () () ())
+> (my-flatten 'a)
+car: expects argument of type <pair>; given a
+> (my-flatten '(a . b))
+car: expects argument of type <pair>; given b
+> 
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Tail Recursion}
+
+A function is \alert{tail-recursive} if the \textbf{absolutely} last
+thing it does before returning is calling itself.
+
+\begin{itemize}
+
+  \item In conventional programming languages, recursion leads to heavy use
+    of stack space.
+
+  \item Scheme guarantees that if a function is tail-recursive, then the
+    recursive call does not use additional stack space.  This is referred
+    to as tail-recursion optimization.
+
+\end{itemize}
+
+Note: \verb@fact@ is not tail-recursive, because recursive-call return value
+must be multiplied by \verb@n@ before return.  \verb@iter-fib-aux@ is
+tail-recursive.
+
+\end{frame}
+
+\begin{frame}[fragile]{Tail Recursion in C}
+
+A tail-recursive function 
+
+\begin{ccode*}{}
+      int f(params) {  
+        if (baseCase(params)) {
+          return g(params); /* non-recursive */
+        }
+        else {
+          return f(newParams); 
+        }
+      }
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Tail Recursion in C Continued}
+
+Tail recursive function is replaced by
+
+\begin{ccode*}{}
+      int f(params) {  
+      loop:
+        if (baseCase(params)) {
+          return g(params); /* non-recursive */
+        }
+        else {
+          params = newParams;
+          goto loop;
+        }
+      }
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Tail Recursion in C Continued}
+
+Previous function is equivalent to:
+
+\begin{ccode*}{}
+      int f(params) {  
+        while (!baseCase(params)) {
+          params = newParams;
+        }
+        return g(params);  /* non-recursive */
+      }
+\end{ccode*}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Tail-Recursive Factorial in C}
+
+
+Consider iterative C factorial from \href{./programs/fact.c}{programs/fact.c}:
+
+@pre{cfile}[begintag=@1@,endtag=@2@]{fact.c}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Tail-Recursive Factorial in Scheme}
+
+
+  Equivalent Scheme function in
+\href{./programs/iter-fact.scm}{programs/iter-fact.scm}.  Note that
+\verb@aux-fact@ is tail-recursive, hence it is guaranteed to run in constant
+stack-space.
+
+@pre{scmfile}{iter-fact.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{DFA Simulation}
+
+\begin{itemize}
+
+\item A \alert{Deterministic Finite Automaton} (DFA) consists of a set
+  of states, a set of inputs and transitions from state to state based
+  on the input.
+
+\item A distinguished state is the \alert{initial} state.
+
+\item Some set of states are \alert{final} states.
+
+\item A sequence of input symbols is accepted if starting in the initial state, the machine makes transitions on the input symbols and lands up in a final state.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Scheme: DFA Representation}
+
+Represent DFA as a 3-element list \verb@(@ \textit{Initial} \textit{Transitions} \textit{Finals}\verb@)@.
+
+\begin{description}
+\item[\textit{Initial}] The initial state of the DFA.
+
+\item[\textit{Transitions}] A list of transitions, where each \textit{transition}
+is represented as a 2-element list \verb@((@\textit{FromState} \textit{Input}\verb@)@ \textit{ToState}\verb@)@ representing the transition from state \textit{FromState} on input symbol \textit{Input} to state \textit{ToState}.
+
+\item[Finals] A list of final states.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Scheme: DFA Representation Continued}
+
+\begin{figure}
+\includegraphics[width=90mm]{figs/10-2}\\
+DFA Example
+\end{figure}
+
+\end{frame}
+
+\begin{frame}[fragile]{DFA Simulation: Code}
+
+@pre{scmfile}[begintag=@1@,endtag=@2@]{dfa.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{DFA Simulation Code: Continued}
+
+@pre{scmfile}[begintag=@3@,endtag=@4@]{dfa.scm}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{DFA Simulation: Log}
+
+@pre{scmfile}[begintag=@4@]{dfa.scm}
+
+\begin{verbatim}
+ => (q0 q2 q3 q2 q0 q1 reject)
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{First Class Functions}
+
+\begin{itemize}
+
+  \item Scheme allows functions as arguments to other functions.
+
+  \item Scheme allows functions to return functions.
+
+  \item We often want to \verb@map@ each element of a list via some function.
+
+  \item We also often want to reduce all the elements of a list to a single
+    element via some function.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Mapping a List}
+
+
+Map function in \href{./programs/my-map.scm}{programs/my-map.scm}:
+
+@pre{scmfile}{my-map.scm}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Mapping a List Log}
+
+\begin{verbatim}
+> (load "my-map.scm")
+> (my-map add1 '(1 2 3))
+(2 3 4)
+> (my-map add1 ())
+()
+> (my-map (lambda (x) (* 3 x)) '(1 2 3))
+(3 6 9)
+> (my-map length '(() (a) (a b c (d e) f)))
+(0 1 5)
+>
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Anonymous Mapping Functions}
+
+\begin{itemize}
+
+
+  \item Previous transparency illustrated the use of a anonymous function.
+
+\begin{verbatim}
+    > (my-map (lambda (x) (* 3 x)) '(1 2 3))
+    (3 6 9)
+\end{verbatim}
+
+  \item Anonymous functions avoid cluttering up global namespace with
+    functions used only within some other function.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Local Mapping Functions}
+
+Alternatively, could use \verb@let@ to give a temporary name to the function.
+
+\begin{verbatim}
+    > (let ((times3 (lambda (x) (* 3 x)))) 
+           (my-map times3 '(1 2 3)))
+    (3 6 9)
+    > times3
+    reference to undefined identifier: times3
+\end{verbatim}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Recursive Local Functions}
+
+
+What if function is recursive?   Consider mapping factorial as in 
+\href{./programs/map-fact-let.scm}{programs/map-fact-let.scm}:
+
+@pre{scmfile}{map-fact-let.scm}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{map-fact-let Log}
+
+\begin{verbatim}
+> (load "map-fact-let.scm")
+> (map-fact-let '(3 4 5))
+fact1: undefined;
+ cannot reference undefined identifier
+>
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Recursive let}
+
+
+Use letrec as in \href{./programs/map-fact-letrec.scm}{map-fact-letrec.scm}:
+
+@pre{scmfile}{map-fact-letrec.scm}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Recursive let Log}
+
+
+\begin{verbatim}
+> (load "map-fact-letrec.scm")
+> (map-fact-letrec '(-1 0 1 2 3 5 6))
+(1 1 1 2 6 120 720)
+> 
+\end{verbatim}
+
+                                
+\end{frame}
+
+\begin{frame}[fragile]{Reducing a List}
+
+\begin{itemize}
+
+  \item Consider summing the elements of a list.  We can do that by 
+    accumulating a sum by applying \verb@+@ to each successive element and a
+    accumulator.
+  
+  \item Consider multiplying the elements of a list.  We can do that by 
+    accumulating a product by applying \verb@*@ to each successive element and a
+    accumulator.
+  
+  \item Define \verb@(reduce '(a1 a2 ... aN) z f)@ to be \verb@(f a1 (f a2 ... (f aN z)))@
+    
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Scheme Reduce}
+
+Scheme definition in \href{./programs/reduce.scm}{programs/reduce.scm}:
+
+@pre{scmfile}{reduce.scm}
+
+\begin{verbatim}
+    > (load "reduce.scm")
+    > (reduce '(1 2 3 4 5) 0 +)
+    15
+    > (reduce '(1 2 3 4 5) 1 *)
+    120
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Functions Which Return Functions}
+
+\begin{verbatim}
+> (define add-n (lambda (n) (lambda (x) (+ n x))))
+> ((add-n 4) 5)
+9
+> (define add-5 (add-n 5))
+> add-5
+#<procedure:STDIN::27>
+> (add-5 6)
+11
+> ((add-n -4) 3)
+-1
+> 
+\end{verbatim}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Destructive Assignment}
+
+
+\verb@(set! v e)@ sets the value of variable \verb@v@ to expression \verb@e@.
+
+For example:
+
+\begin{verbatim}
+> (let ((f (lambda (x) (+ x 5))))
+       (display (f 10)) (newline)
+       (set! f (lambda (x) (* x 10)))
+       (f 10))
+15
+100
+>
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Closures: Bank Account}
+
+
+A bank account:
+
+@pre{scmfile}[endtag=@1@]{bank-account.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{Closures: Bank Account Continued}
+
+@pre{scmfile}[begintag=@1@]{bank-account.scm}
+
+\end{frame}
+
+\begin{frame}[fragile]{Bank Account Log}
+
+\begin{verbatim}
+> (load "balance.scm")
+> (define a1 (account 100))
+> (define a2 (account 50))
+> ((deposit a1) 20)
+120
+> ((withdraw a1) 40)
+80
+> ((deposit a2) 80)
+130
+> ((withdraw a2) 20)
+110
+> ((deposit a1) 100)
+180
+>
+\end{verbatim}
+
+\end{frame}
+
+%% \begin{frame}[fragile]{Memoization}
+
+
+%% Save results of a time-consuming computation in a table:
+
+%% \begin{verbatim}
+%% (define memoize
+%%   (lambda (proc)
+%%     (let ((memo '()))
+%%       (lambda (arg) 
+%%         (let ((v (lookup arg memo)))
+%%           (if (null? v)
+%%               (let ((result (proc arg)))
+%%                 (set! memo (cons (cons arg result) memo))
+%%                 result
+%%               )
+%%               v))))))
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Memoization Continued}
+
+%% \begin{verbatim}
+%% (define lookup 
+%%   (lambda (key ls) 
+%%     (let ((a (assoc key ls)))
+%%       (if a (cdr a) '()))))
+
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Memoizing fib}
+
+%% \begin{verbatim}
+%% (define fib
+%%   (lambda (n)
+%%      (display "(fib ") (display n) (display ")\n")
+%%      (if (< n 2)
+%%          n
+%%          (+ (fib (- n 1)) (fib (- n 2))))))
+
+%% (define fib-m (memoize fib))
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Regular fib Log}
+
+%% \begin{verbatim}
+%% > (fib 5)
+%% (fib 5)
+%% (fib 4)
+%% (fib 3)
+%% (fib 2)
+%% (fib 1)
+%% (fib 0)
+%% (fib 1)
+%% (fib 2)
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Regular fib Log}
+
+%% \begin{verbatim}
+%% (fib 1)
+%% (fib 0)
+%% (fib 3)
+%% (fib 2)
+%% (fib 1)
+%% (fib 0)
+%% (fib 1)
+%% 5
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Memoizing fib Log}
+
+%% \begin{verbatim}
+%% > (fib-m 5)
+%% (fib 5)
+%% (fib 4)
+%% (fib 3)
+%% (fib 2)
+%% (fib 1)
+%% (fib 0)
+%% (fib 1)
+%% (fib 2)
+%% (fib 1)
+%% (fib 0)
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Memoizing fib Log Continued}
+
+%% \begin{verbatim}
+%% (fib 3)
+%% (fib 2)
+%% (fib 1)
+%% (fib 0)
+%% (fib 1)
+%% 5
+%% > (fib-m 5)
+%% 5
+%% >
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Memoizing Recursive Calls}
+
+%% \begin{verbatim}
+%% (define fib-memo
+%%   (memoize (lambda (n) 
+%%              (display "(fib-memo ") 
+%%              (display n) 
+%%              (display ")\n")
+%%              (if (< n 2)
+%%                  n
+%%                  (+ (fib-memo (- n 1)) 
+%%                     (fib-memo (- n 2)))))))
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Memoizing Recursive Calls Log}
+
+%% \begin{verbatim}
+%% > (fib-memo 5)
+%% (fib-memo 5)
+%% (fib-memo 4)
+%% (fib-memo 3)
+%% (fib-memo 2)
+%% (fib-memo 1)
+%% (fib-memo 0)
+%% 5
+%% >
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Named Let}
+
+%% \begin{verbatim}
+%% (letrec ((countdown 
+%%           (lambda (i)
+%%             (if (= i 0) 
+%%                 'liftoff
+%%                 (begin
+%%                   (display i)
+%%                   (newline)
+%%                   (countdown (- i 1)))))))
+%%   (countdown 10))
+%% \end{verbatim}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Named Let}
+
+%% \begin{verbatim}
+%% (let countdown ((i 10))
+%%   (if (= i 0) 'liftoff
+%%       (begin
+%%         (display i)
+%%         (newline)
+%%         (countdown (- i 1)))))
+%% \end{verbatim}
+
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{List Position}
+
+
+%% \begin{verbatim}
+%% (define list-position
+%%   (lambda (o l)
+%%     (let loop ((i 0) (l l))
+%%       (if (null? l) #f
+%%           (if (eqv? (car l) o) i
+%%               (loop (+ i 1) (cdr l)))))))
+%% \end{verbatim}
+
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Destructive List Reverse}
+
+
+%% \begin{verbatim}
+%% define reverse!
+%%   (lambda (s)
+%%     (let loop ((s s) (r '()))
+%%       (if (null? s) r
+%%           (let ((d (cdr s)))
+%%             (set-cdr! s r)
+%%             (loop d s))))))
+%% \end{verbatim}
+
+%% \end{frame}
+
+\begin{frame}[fragile]{References}
+
+\begin{itemize}
+
+\item Text, Chapter 11, through 11.3.
+
+\item  Harold Abelson, Gerald Jay Sussman with Julie Sussman,
+\href{http://mitpress.mit.edu/sicp/full-text/book/book.html}{\em Structure and Interpretation of Computer Programs}, MIT Press, 1984.
+
+
+\item R. Kent Dybvig, \href{http://www.scheme.com/tspl2d/index.html}{\em The
+Scheme Programming Language}, Second Edition, Prentice-Hall, 1996.
+
+\item \href{http://download.plt-scheme.org/doc/205/html/r5rs/index.htm}{\em Revised Report on the Algorithmic Language Scheme}, 1998.
+
+
+\item Dorai Sitaram, \href{http://download.plt-scheme.org/doc/205/html/t-y-scheme/index.htm}{\em Teach Yourself Scheme in FixNum Days}.
+
+\item George Spring and Daniel P. Friedman, {\em Scheme and the Art of Programming}, 
+McGraw-Hill, 1989.
+
+\item \href{http://learnxinyminutes.com/docs/racket/}{Learn racket in Y Minutes}
+
+\end{itemize}
+
+\end{frame}
+
+
+\end{document}

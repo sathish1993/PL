@@ -1,0 +1,421 @@
+% -*- mode: latex -*-
+% vi: set ft=latex :
+\documentclass{beamer}
+
+%derived from beamer solution generic-ornate-15min-45min.en.tex
+
+\mode<presentation>
+{
+  \usetheme{Warsaw}
+  \setbeamercovered{transparent}
+}
+
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+\usepackage{minted}
+
+\newminted{java}{linenos}
+\newmintedfile{java}{linenos}
+
+\title[CS 571 Discrete Math Review]{Discrete Match Review}
+
+%\subtitle
+%{Presentation Subtitle} % (optional)
+
+%\author[Author, Another] % (optional, use only with lots of authors)
+%{F.~Author\inst{1} \and S.~Another\inst{2}}
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+%\institute[Universities of Somewhere and Elsewhere] % (optional, but mostly needed)
+%{
+%  \inst{1}%
+%  Department of Computer Science\\
+%  University of Somewhere
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+%\date[Short Occasion] % (optional)
+%{Date / Occasion}
+
+%\subject{Talks}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}<beamer>{Outline}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+
+\setbeamertemplate{headline}{}
+
+@begin{include_path}
+  programs/arith/src/edu/binghamton/cs571
+@end{include_path}
+
+\begin{document}
+
+\begin{frame}[fragile]{Overview}
+
+\begin{itemize}
+
+\item Collections: sets, multi-sets, sequences.
+
+\item Relations: predicates, binary relations, n-ary relations.
+
+\item Functions: injective, surjective, bijective.
+
+\item Propositional logic.
+
+\item First-order logic.
+
+\item Validity.
+
+\item Normal forms.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Sets}
+
+\begin{description}
+
+\item[Set:] A collection of distinct elements.  No ordering.  
+
+\item[Empty set:] $\emptyset$.
+
+\item[Universal set:] $U$ wrt some domain.
+
+\item[Basic Operations:] \alert{membership}: $a\in A$.  \alert{union} $A\cup B$, \alert{intersection} $A
+  \cap B$, \alert{absolute complement} $A'$ wrt $U$, \alert{relative complement} $A - B$.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Sets Continued}
+
+\begin{description}
+
+\item[Properties:] $\emptyset$ identity for $\cup$, $U$ identity for $\cap$,
+  union and intersection are \textit{idempotent}, \textit{associative} and \textit{commutative}, $\cup$
+  \textit{distributes over} $\cap$ and vice-versa.
+
+\item[Subset:] $A \subset B$ if every element which belongs to $A$ also
+belongs to $B$.  $\emptyset \subset A$ for all sets $A$.
+
+\item[Power set:] The set of all subsets of $A$ is $P(S)$.  Given $S = \{a, b\}$, $P(S) = \{\{\}, \{a\}, \{b\}, \{a, b\}\}$.
+
+\item[Cartesian Product:] Given two sets $A$ and $B$, the \alert{cartesian product} $A \times B = \{(a, b) | a \in A, b \in B\}$.  For example, if $A = \{a, b\}$ and $B = \{0, 1, 2\}$, $A \times B = \{(a, 0), (a, 1), (a, 2), (b, 0), (b, 1), (b, 2)\}$.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Set Cardinality}
+
+\begin{itemize}
+
+\item The number of elements $|S|$ in a set $S$ is known as its \alert{cardinality}.
+
+\item If $|A| = n$, then $|P(A)| = 2^n$.
+
+\item What is the cardinality of the set of all natural numbers
+  $\mathcal{N}$, the cardinality of the set of all real numbers $\mathcal{R}$?
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Multi-Sets}
+
+\begin{itemize}
+
+\item Allows repeated elements: aka \alert{bag}.
+
+\item For an element, it makes sense to ask how many occurrences there are
+  of that element.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Sequences}
+
+\begin{itemize}
+
+\item An \textit{ordered} collection of elements (may contain repetitions).
+
+\item Can be put into 1:1 correspondence with $\mathcal{N}$.
+
+\item Index-set: $0, 1, 2, \ldots$.
+
+\item A {\em tuple} is a sequence of a specified length.  A $n$-tuple is
+denoted as $(s_1, s_2, \ldots s_n)$.  If $n = 2$, we have a {\em pair}.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Relations}
+
+A \alert{relation} $R$ over sets $S_1, S$2, \ldots $S_n$, is some subset of 
+$S_1\times S2 \times \ldots \times S_n$
+
+\begin{itemize}
+
+\item When $n = 1$, we have a \alert{unary relation}, aka {\em predicate}.
+
+\item When $n = 2$, we have a \alert{binary relation}.  If $(s_1, s_2)\in R$,
+  we say that $s_1\;R\;s_2$.  
+
+\item We say that $R$ is true for $(s_1, s_2, \ldots s_n)$ iff  $(s_1, s_2,\ldots s_n) \in R$.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Relation Properties}
+
+A binary relation $R \subset (A \times A)$ is:
+\begin{description}
+
+\item[Reflexive] $a\,R\,a,\; \forall a\in A$.
+
+\item[Irreflexive] There is no $a\in R$ such that $a\,R\,a$.
+
+\item[Symmetric]  $a\,R\,b \Rightarrow b\,R\,a$.
+
+\item[Anti-symmetric] $a\,R\,b \wedge b\,R\,a \Rightarrow a = b$.  
+
+\item[Transitive] $a\,R\,b \wedge b\,R\,c \Rightarrow a\,R\,c$.  
+
+\item[Equivalence Relation] Reflexive, symmetric and transitive.
+
+\item[Partial order] Reflexive, anti-symmetric and transitive.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Inverse Relation}
+
+Given a binary relation $R$, its \alert{inverse} relation $R^{-1}$ is
+defined such that if $(a, b)\in R$ iff $(b, a)\in R^{-1}$.
+
+\end{frame}
+
+\begin{frame}[fragile]{Functions}
+
+Given a set $D$ called the \alert{domain} and a set $R$ called the \alert{range}
+(or \alert{codomain}), a relation $F\in (D\times R)$ is a function iff
+$\forall d\in D, (d, r_1)\in F \wedge (d, r_2) \in F \Rightarrow r_1 = r_2$.
+We say that $F:D\rightarrow R$; if $(d, r)\in F$, we say that $F(d) = r$.
+
+\begin{itemize}
+
+\item If $F$ is defined for all $d\in D$, then we say that $F$ is
+\alert{total}.  If $F$ may or may not be defined for all $d \in D$,
+then we call it \alert{partial}.
+
+\item The definition implies that for any value $d$ in the domain, $F$ maps
+it to at most one element in the range.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Function Properties}
+
+Given a function $F: A\rightarrow B$ it is:
+
+\begin{description}
+
+\item[surjective] If for all $b\in B$ there is a $a\in A$ such that $F(a) =
+  b$. AKA \alert{onto}.
+
+\item[injective] If $F(a) = F(b)$, then $a = b$. AKA \alert{one-to-one}.
+
+\item[bijective] Surjective and injective. AKA \alert{one-to-one and onto} or
+  \alert{one-to-one correspondence}.
+\end{description}
+
+The inverse of a bijective function $F$ is also a function $F^{-1}$. 
+
+\end{frame}
+
+\begin{frame}[fragile]{Propositional Logic Well-Formed Formulas}
+
+\begin{description}
+
+\item[Constants:] \verb@true@ or \verb@false@. 
+
+\item[Atoms:] Variables $p$, $q$, etc. standing for either \verb@true@ or
+  \verb@false@.
+
+\item[Basic Operators:] $\vee$ for {\em or}, $\wedge$ for {\em and}, $\neg$ for
+  {\em not}.
+
+\item[Implication:] $p \Rightarrow q$ equivalent to $\neg p \vee q$. 
+
+\item[Equivalence:] $p \Leftrightarrow q$ or $p \equiv q$ or $p \;\mbox{iff}\;
+  q$ equivalent to $(p \Rightarrow q) \wedge (q \Rightarrow p)$. 
+ 
+\end{description}
+
+Operator precedence: (lowest) $\equiv$ and $\Rightarrow$, $\vee$, $\wedge$,
+$\neg$ (highest).
+
+\end{frame}
+
+\begin{frame}[fragile]{Propositional Operators Truth Table}
+
+\[
+\begin{array}{|cc||ccccc|}
+\hline
+p & q & p \vee q & p \wedge q & \neg p & p \Rightarrow q & p\equiv q\\
+\hline
+\mbox{\texttt{false}} & \mbox{\texttt{false}} & \mbox{\texttt{false}} & \mbox{\texttt{false}} & \mbox{\texttt{true}} & \mbox{\texttt{true}} & \mbox{\texttt{true}}\\
+\mbox{\texttt{false}} & \mbox{\texttt{true}} & \mbox{\texttt{true}} & \mbox{\texttt{false}} & \mbox{\texttt{true}} & \mbox{\texttt{true}} & \mbox{\texttt{false}}\\
+\mbox{\texttt{true}} & \mbox{\texttt{false}} & \mbox{\texttt{true}} & \mbox{\texttt{false}} & \mbox{\texttt{false}} & \mbox{\texttt{false}} & \mbox{\texttt{false}}\\
+\mbox{\texttt{true}} & \mbox{\texttt{true}} & \mbox{\texttt{true}} & \mbox{\texttt{true}} & \mbox{\texttt{false}} & \mbox{\texttt{true}} & \mbox{\texttt{true}}\\
+\hline
+\end{array}
+ \] 
+
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Tautologies}
+
+A WFF is \alert{satisfiable} if there is some interpretation (assignment to
+\verb@true@ or \verb@false@) for its atoms such that the WFF
+evaluates to \verb@true@.
+
+A WFF is a \alert{tautology} if it is true under {\bf all} interpretations.
+Examples: $p \vee \neg p$, $p \equiv p$, $p \Rightarrow (p \vee q)$.
+
+A WFF is a \alert{contradiction} if it is false under {\bf all}
+interpretations.  Examples: $p \wedge \neg p$, $p \equiv\neg p$.
+
+\end{frame}
+
+\begin{frame}[fragile]{First-Order Logic}
+
+\begin{description}
+
+\item[Terms:] used to denote objects from some non-empty domain.
+  Represented using infinite set of $n$-ary function symbols $f^n_0$,
+  $f^n_1$, $\ldots$ applied to $n$ objects.
+
+\item[Predicates:] used to represent relations.  Represented using an
+  infinite set of $n$-ary predicate symbols $p^n_0$, $p^n_1$, $\ldots$
+  applied to $n$ objects.
+
+\item[Operators:] Propositional operators.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{First-Order Logic Continued}
+
+\begin{description}
+
+\item[Variables:] Standing for terms.
+
+\item[Quantifiers: ] $\forall x\, P$, $\exists x\, P$ where $x$ is a variable
+  and $P$ is a WFF.  Note that $\forall x\, P$ stands for $P(a_1)\wedge
+  P(a_2)\ldots \wedge P(a_n)$ and $\exists x\, P$ stands for $P(a_1)\vee
+  P(a_2)\ldots \vee P(a_n)$ where the domain consists of $a_1, a_2, \ldots
+  a_n$.
+\item[Sentence:] WFF without free variables.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Valid WFFs}
+
+A sentence is \alert{satisfiable} if there is some domain and interpretation
+for its term and predicate symbols under which it is \verb@true@.
+
+A sentence is \alert{valid} iff it is true under all domains and
+interpretations.
+
+\[\neg \forall x\, p(x) \equiv \exists x\, \neg p(x)\]
+
+\[\neg \exists x\, p(x) \equiv \forall x\, \neg p(x)\]
+
+\end{frame}
+
+\begin{frame}[fragile]{Normal Form}
+
+\begin{itemize}
+
+\item \alert{Conjunctive normal form} for propositional logic.
+Example: $(p_1 \vee \neg p_2) \wedge (\neg p_1 \vee p_3) \wedge (p_1
+\vee p_2 \vee \neg p_3)$.
+
+\item \alert{Disjunctive normal form} for propositional logic.
+Example: $(p_1 \wedge \neg p_2) \vee (\neg p_1 \wedge p_3) \vee (p_1
+\wedge p_2 \wedge \neg p_3)$.
+
+\item \alert{Clausal form} for first-order logic.  CNF with implicit universal
+  quantification (existential quantifiers replaced by skolem functions).
+Example: The WFF
+
+\[
+\begin{array}{l}
+\lbrack\forall X1 \forall Y1 \;\mbox{father}(X1, Y1) \Rightarrow \mbox{parent}(X1, Y1)\rbrack\;\wedge\\
+\lbrack\forall X2 \forall Y2 \;\mbox{mother}(X2, Y2) \Rightarrow \mbox{parent}(X2, Y2)\rbrack\;\wedge\\
+\lbrack\forall X3 \forall Y3 \;\mbox{parent}(X3, Y3) \Rightarrow \mbox{father}(X3, Y3) \vee \mbox{mother}(X3, Y3)\rbrack
+\end{array}
+\]
+has clausal form:
+\[
+\begin{array}{l}
+\lbrack\;\neg\mbox{father}(X1, Y1) \vee \mbox{parent}(X1, Y1)\rbrack\;\wedge\\
+\lbrack\;\neg\mbox{mother}(X2, Y2) \vee \mbox{parent}(X2, Y2)\rbrack\;\wedge\\
+\lbrack\;\neg\mbox{parent}(X3, Y3) \vee \mbox{father}(X3, Y3) \vee \mbox{mother}(X3, Y3)\rbrack
+\end{array}
+\]
+
+\end{itemize}
+
+
+\end{frame}
+
+\end{document}

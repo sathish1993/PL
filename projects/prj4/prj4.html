@@ -1,0 +1,115 @@
+<html>
+<head>
+<title>Project 4: Prolog Programming </title>
+</head>
+<body bgcolor="#ffffff">
+<h1 align="center">Project 4: Prolog Programming </h1>
+<p>
+<b>Due Date</b>: 11/23 by 11:59p
+</p>
+<p>
+<b>Important Reminder</b>: As per the course Academic Honesty Statement,
+cheating of any kind will minimally result in receiving an F letter
+grade for the entire course.
+</p>
+<h2>Aims of This Project</h2>
+<p>
+The aims of this project are as follows:
+</p>
+<ul>
+<p><li>
+To give you an introduction to programming in Prolog.
+</p>
+<p><li>
+To expose you to using pattern matching for both constructing
+    and accessing data-structures.
+</p>
+<p><li>
+To familiarize you with using backtracking in Prolog.
+</p>
+</ul>
+<h2>Project Specification</h2>
+<p>
+You are required to submit a <tt>prj4.tar.gz</tt> archive which contains a
+file <tt>prj4-sol.pl</tt> which can be run using the <tt>swipl</tt> implementation of
+Prolog on <tt>remote.cs</tt>.
+</p>
+<p>
+The file should implement the functions specified in the skeleton <a href="./files/prj4-sol.pl">file</a> provided.  Your solutions may include
+auxiliary top-level procedures unless explicitly forbidden.
+</p>
+<h2>Provided Files</h2>
+<p>
+The <a href="./files">./files</a> directory contains the following:
+</p>
+<dl>
+<p><dt><a href="./files/Makefile">Makefile</a><dd>
+    This file contains a <tt>submit</tt> target such that typing <tt>make
+    submit</tt> will create a <tt>prj4.tar.gz</tt> archive containing the files
+    to be submitted. The <tt>clean</tt> target will remove the archive.
+</p>
+<p>
+    You may edit this file if you choose to use a different
+    organization for your project.  When editing, watch out for tabs
+    (the first character of any command-line <b>must be a tab
+    character</b>).
+</p>
+<p><dt><a href="./files/README">README</a><dd>
+    A template README; replace the <tt>XXX</tt> with your name, B-number and
+    email.  You may add any other information you believe is relevant
+    to your project submission.  In particular, you should document
+    the data-structure used for your word-store.
+</p>
+<p><dt><a href="./files/prj4-sol.pl">prj4-sol.pl</a><dd>
+    A skeleton file for the exercises.
+</p>
+</dl>
+<h2>Hints</h2>
+<p>
+You may choose to follow the following hints (they are not by any
+means required).  They assume that you are using the project structure
+supported by the provided <a href="./files/Makefile">Makefile,</a>.
+</p>
+<ul>
+<p><li>
+First work on your solutions using Prolog's declarative semantics.
+    Write facts and rules for a problem which states something
+    about the problem domain.
+<p>
+    Then think about the procedural semantics.  It may be a good
+    idea to include facts/rules corresponding to base cases
+    before facts/rules corresponding to recursive cases (this
+    should not affect correctness, but may result in different
+    orders of solutions or a solution versus an infinite loop).
+</p>
+</p>
+<p><li>
+The swipl version on <tt>remote.cs</tt> is quite old.  In particular,
+    the representations of Prolog strings (required for Exercise 5)
+    has changed in newer versions.
+</p>
+</ul>
+<h2>Submission</h2>
+<p>
+You will need to submit a compressed archive file <tt>prj4.tar.gz</tt> which
+contains all the files necessary to build your jar file.
+Additionally, this archive <b>must</b> contain a <tt>README</tt> file which should
+minimally contain your name, B-number, email, the status of your
+project and any other information you believe is relevant.
+</p>
+<p>
+If you are using the suggested project structure, then the provided
+<a href="./files/Makefile">Makefile</a> provides a <tt>submit</tt> target which will
+build the compressed archive for you; simply type <tt>make submit</tt>.
+</p>
+<p>
+Note that it is your responsibility to ensure that your submission is
+complete.  To test whether your archive is complete, simply unpack it
+into a empty directory and see if it runs correctly.
+</p>
+<p>
+To submit the above archive, please use blackboard by following the
+<tt>Content-&gt;Projects</tt> link.
+</p>
+</body>
+</html>

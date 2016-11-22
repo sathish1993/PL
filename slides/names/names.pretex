@@ -1,0 +1,1622 @@
+% -*- mode: latex -*-
+% vi: set ft=latex :
+\documentclass{beamer}
+
+%derived from beamer solution generic-ornate-15min-45min.en.tex
+
+\mode<presentation>
+{
+  \usetheme{Warsaw}
+  \setbeamercovered{transparent}
+}
+
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+\usepackage{minted}
+
+\newminted{java}{linenos}
+\newmintedfile{java}{linenos}
+
+\newminted{js}{linenos}
+\newmintedfile{js}{linenos}
+
+\newminted{perl}{linenos}
+\newmintedfile{perl}{linenos}
+
+\newminted{ruby}{linenos}
+\newmintedfile{ruby}{linenos}
+
+\newminted{c}{linenos=false}
+
+
+\title[CS 571 Names]{Names}
+
+%\subtitle
+%{Presentation Subtitle} % (optional)
+
+%\author[Author, Another] % (optional, use only with lots of authors)
+%{F.~Author\inst{1} \and S.~Another\inst{2}}
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+%\institute[Universities of Somewhere and Elsewhere] % (optional, but mostly needed)
+%{
+%  \inst{1}%
+%  Department of Computer Science\\
+%  University of Somewhere
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+%\date[Short Occasion] % (optional)
+%{Date / Occasion}
+
+%\subject{Talks}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}<beamer>{Outline}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+
+\setbeamertemplate{headline}{}
+
+@begin{include_path}
+  programs
+@end{include_path}
+
+\begin{document}
+
+%\begin{frame}
+%  \titlepage
+%\end{frame}
+
+\begin{frame}[fragile]{Binding Time}
+
+\begin{itemize}
+
+\item A \alert{binding} is an association between a \alert{name} and the
+\alert{entity} it denotes.
+
+\item \alert{Binding time} is the time at which a binding is made.
+
+\item In general, early binding leads to greater efficiency, later binding
+leads to greater flexibility.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Binding Times}
+
+\begin{description}
+
+\item[Language Design Time:] Constructs for control-flow (\verb@for@,
+  \verb@switch@), data aggregating constructors (\verb@array@,
+  \verb@structures@) are chosen at language design time.
+
+\item[Language Implementation Time:] Typically the precision of numeric
+  types, handling of runtime exceptions, coupling to the OS, runtime
+  organization of memory are chosen when the language is being implemented.
+
+\item[Program Writing Time:]  Programmers choose names, data structures and
+  algorithms.  
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Binding Times C>ontinued}
+
+\begin{description}
+
+\item[Compile Time:] The mapping of high-level constructs to machine code,
+  the memory layout of static data and the memory layout of stack frames.
+
+\item[Link Time:] Usually programs consist of many separately compiled
+  units (\textit{object files}), where names in one compilation unit
+  refer to entities defined in other compilation units.  These
+  inter-unit references are resolved at link time.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Binding Times Continued}
+
+\begin{description}
+
+\item[Load Time:] The physical (old OS) or virtual (modern OS) address of
+  entities is determined at load time.  
+
+\item[Run Time:] Bindings of values to variables occur at run time.
+  Run time includes \textit{program startup time}, \textit{module entry
+    time}, \textit{elaboration time} when declarations are first
+  encountered, \textit{subroutine call time}, \textit{block entry
+    time} and \textit{statement execution time}.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Static versus Dynamic}
+
+\begin{itemize}
+
+\item The word {\em static} is used to describe to bindings made {\bf
+before} run time, whereas the word {\em dynamic} is used to describe
+bindings made {\bf during} run time.
+
+\item Compilers are more efficient than interpreters because they make
+earlier decisions and predict the address of variables at compile-time.
+
+\item \alert{Just-In-Time} (JIT) compilers can be more efficient than
+static compilers as they can take advantage of runtime information.
+
+\item Certain language features require dynamic capabilities:
+Smalltalk's {\em polymorphic} dispatch of a {\em message} to a {\em
+receiver} requires searching a run-time inheritance chain for a super-class
+of the receiver which understands the message; else {\em message not
+understood} error.
+
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Entity and Binding LifeCycle Events}
+
+\begin{itemize}
+
+\item Creation of entities.
+
+\item Creation of bindings.
+
+\item References to names representing variables, functions etc. which use
+  bindings.  
+
+\item Deactivation and reactivation of bindings. For example, a binding
+lifetime can have a hole when a block which {\em hides} a variable is
+active.
+
+\item Destruction of bindings.
+
+\item Destruction of entities.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Entity and Binding LifeCycle Events Continued}
+
+\begin{itemize}
+
+\item Binding and entity lifetime not necessarily coincident.
+
+\item A binding between a reference parameter to a subroutine and an entity
+  is destroyed when the subroutine terminates, but the entity survives.
+  For example, in C++ \verb@void swap(int &x, int &y)@, the \verb@int@'s
+  bound to by \verb@x@ and \verb@y@ continue to exist even after
+  a call to `\verb@swap()@ exits and the binding is destroyed.
+
+\item Binding can have longer lifetime than entity as when an entity is
+\verb@malloc()@'d in C and pointed to by some pointer \verb@p@, but entity
+is \verb@free()@'d before \verb@p@ goes out of scope.  For example:
+
+\begin{verbatim}
+     { char *p = malloc(1000);
+       ...
+       free(p);
+       //name p continues to exist
+     }
+\end{verbatim}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Entity Lifetimes}
+
+\begin{itemize}
+
+\item Coincident with {\em lifetime of program}.   Can use {\em static
+  allocation}.
+
+\item Coincident with {\em lifetime of function, subroutine or block}.  Can use
+a LIFO {\em stack allocation}.
+
+\item Indeterminate lifetime.  Can use {\em heap allocation}.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Static Allocation}
+
+\begin{itemize}
+
+\item Global variables.  Normally a bad idea for non-constant data
+in modern \textit{multi-threaded} programs.
+
+\item Constants like numeric and string literals.  ``Small'' constants fit
+  within instructions; ``large'' constants need separate locations.  
+  
+\item Tables produced by compiler for exception handling, control
+  (case-statements), dynamic type checking, etc.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Static Allocation for Subroutines}
+
+\begin{figure}
+\includegraphics[width=90mm]{figs/3-01}\\
+Static Space Allocation for Subroutines
+\end{figure}
+
+\end{frame}
+
+\begin{frame}[fragile]{Static Allocation for Subroutines Continued}
+
+\begin{itemize}
+
+\item Primary allocation mechanism in Fortran, pre Fortran-90.
+
+\item Recursion impossible.
+
+\item Does not make efficient use of memory as some subroutines may never
+be active simultaneously.  Resolved by the programmer in Fortran using
+\verb@COMMON@ and \verb@EQUIVALENCE@ statements.
+
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Static/Own Variables in Subroutines}
+
+\begin{verbatim}
+unsigned int rand() {
+  enum { a = 1664525, c = 1013904223 };
+  static unsigned int seed = 1234;
+  return seed = a*seed + c;
+}
+\end{verbatim}
+
+Static variables used even within subroutines in languages which allow
+recursion.  Retains value between invocations while not allowing visibility
+external to subroutine.
+
+\end{frame}
+
+\begin{frame}[fragile]{Subroutine Constants}
+
+\begin{itemize}
+
+\item Need to distinguish between a {\em compile-time constant} (C\#
+\verb@const@), or constant variables (C\# \verb@readonly@) whose values are
+{\em final} after {\em elaboration time}.
+
+\item Compile-time constants defined within a subroutine can be allocated statically even
+  if the subroutine is recursive.
+
+\item Constant variables cannot be allocated statically if the subroutine is
+  recursive.  
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Stack Allocation Introduction}
+
+\begin{itemize}
+
+\item Necessary if a language permits recursion.
+
+\item Each instance of a subroutine activation has its own {\em stack
+frame} containing arguments (including return value), locals, temporaries
+and bookkeeping information.
+
+\item Details of stack frame layout depend on architecture conventions and
+compiler.  
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Stack Allocation Example}
+
+\begin{figure}
+\includegraphics[width=90mm]{figs/3-02}\\
+Stack Space Allocation for Subroutines
+\end{figure}
+
+\end{frame}
+
+\begin{frame}[fragile]{Stack Allocation Continued}
+
+\begin{itemize}
+
+\item {\em Calling sequence} consists of code executed by caller immediately
+before and after the call and the {\em prologue} code executed by the callee
+at the start of the subroutine and the {\em epilogue} code executed by the
+callee at the end of the subroutine.
+
+\item Location of frame on stack cannot be predicted at compile time, but
+the offset from the frame-pointer \verb@fp@ of entities within the frame can
+be calculated at compile time.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Stack Allocation Continued}
+
+\begin{itemize}
+
+\item Typically, stack grows from high memory towards low memory.  Hence
+typically, arguments have positive offsets from \verb@fp@, whereas locals
+and temporaries have negative offsets.
+
+\item Even with non-recursive subroutines, stack allocation is preferred
+  because memory is allocated only for active subroutines instead of for all
+  subroutines as would be the case with static allocation.
+
+\item With support from all modern architectures, stack allocations is
+generally a big win.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Heap Allocation}
+
+\begin{itemize}
+
+\item Heap allocation is used for entities with arbitrary lifetime and
+dynamically resized entities.
+
+\item Space and time considerations in managing a heap.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Fragmentation}
+
+\begin{itemize}
+
+
+\item {\em Fragmentation} occurs because the algorithm uses to allocate heap
+space makes certain fragments of memory unavailable. 
+
+\item {\em Internal fragmentation} occurs when the algorithm allocates a
+block larger than the request, with the excess portion of the block
+wasted. 
+
+\item {\em External fragmentation} occurs when small free memory blocks are
+scattered throughout the heap. It may be impossible to satisfy a allocation
+request even though the requested size is less than the total amount of free
+memory.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{External Fragmentation}
+
+\begin{figure}
+\includegraphics[width=90mm]{figs/3-03}\\
+External Fragmentation
+\end{figure}
+
+\end{frame}
+
+\begin{frame}[fragile]{Heap Allocation Strategies}
+
+\begin{itemize}
+
+\item Manage free-list of free memory blocks $\ldots$ initially a single
+  block containing the entire heap.
+
+\item {\em First-fit} algorithm allocates the first block which is large
+enough.
+
+\item {\em Best-fit} allocates block which fits exactly or with smallest
+leftover.  
+
+\item {\em Next-fit} starts scan from where previous allocation request
+  succeeded.  
+
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Heap Allocation Strategies}
+
+\begin{itemize}
+
+\item When allocated block is larger than requested size, need to decide
+between internal and external fragmentation.  
+
+\item Free list can be unordered, ordered by address (facilitating {\em
+coalescing}), ordered by increasing size (facilitating {\em best fit}), ordered
+by decreasing size (facilitating {\em worst fit}).
+
+\item Buddy allocation uses multiple free-lists for blocks of specific sizes
+  (powers of 2 or Fibonacci sequence) and rounds up allocation requests to
+  available sizes.  If free list is empty, split block from next higher
+  free list.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Programmer Managed versus Automated Memory Management}
+
+\begin{itemize}
+
+\item Languages like C, C++ require programmer to explicitly deallocate an
+  entity when it is no longer in use.  Leads to {\em dangling pointers} and
+  other hard to debug memory bugs.
+
+\item Most functional languages and more recent imperative languages
+  like Java and C\# use \alert{garbage collection} where an entity is
+  free'd automatically by the run-time when the run-time can prove
+  that there cannot be any live references to the entity.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Garbage Collection}
+
+\begin{itemize}
+
+\item GC used to be inefficient ({\it stop-the-world}!!) and was relegated to
+languages like Lisp, but GC technology has advanced so that now it is
+available in mainstream languages.
+
+\item It is worth emphasizing that GC'd languages can still {\em leak}
+  memory if used carelessly.  It is important to ensure that references to
+unused data-structures be \verb@null@'d out.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Scope}
+
+\begin{itemize}
+
+\item A {\em scope} is a program region of maximal size where no bindings
+  change (or at least, none are destroyed).
+
+\item Languages like Ada use the term {\em elaboration} to refer to the
+  process of activating declarations when a scope is entered.  In Ada,
+  elaboration can include error-checking, heap-space allocation, exception
+  propagation, creation of concurrent tasks.
+
+\item {\em Static} ({\em lexical}) scoping versus {\em dynamic} scoping.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Fortran 77}
+
+\begin{itemize}
+
+\item No recursion.
+
+\item Distinguishes between local and global variables.
+
+\item Unless explicitly \verb@save@'d, local variables have a lifetime equal
+to a single subroutine call (though the common static allocation
+implementation results in a lifetime equal to that of the program).
+
+\item Implicit declaration of undeclared variables; if name starts with
+\verb@[I-N]@, then \verb@INTEGER@ else \verb@REAL@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Managing Memory in Fortran}
+
+\begin{itemize}
+
+\item Global variables can be partitioned into \verb@COMMON@ blocks which
+can then be imported by subroutines.  Helps separate compilation.
+
+\item Each subroutine redeclares the contents of each common block; no
+  check to ensure redeclaration consistency.  Hence possible to have two
+  different variables share the same location within a \verb@COMMON@ block.
+
+\item Similar effect can be achieved by using the \verb@EQUIVALENCE@
+  statement.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Nested Scopes}
+
+\begin{itemize}
+
+\item {\em Closest nested scope rule} for resolving bindings: a name is
+  known in the scope in which it is declared and in each internally nested
+  scope unless {\em hidden} by the redeclaration of the same name in an
+  intervening scope.
+
+\item Ada, Common Lisp, ML, Pascal, Scheme allow nested subroutines.
+
+\item C does not allow nested subroutines, but allows nested blocks.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Nested Scopes}
+
+\begin{itemize}
+
+\item Some languages like Pascal require local declarations at the start of a
+subroutine, others like C89 at the start of a block, others like C++ and
+Java at any point in a block.
+
+\item Usually, scope of declaration is from point of declaration until
+  end of block, but Javascript \textit{hoists} declarations to start
+  of function.
+
+\item Predefined constants and functions are defined in a implicit outermost
+  scope.  This allows the programmer to override these names with alternate
+declarations in inner scopes.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Nested Subroutines in Pascal}
+
+\begin{verbatim}
+procedure P1(A1: T1);
+var X: real;
+  ...
+  procedure P2(A2: T2);
+    ...
+    procedure P3(A3: T3);
+      ...
+      begin (* body of P3 *) end;
+    begin (* body of P2 *) end;
+    ...
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Nested Subroutines in Pascal}
+
+\begin{verbatim}
+    procedure P4(A4: T4);
+      ...
+      function F1(A5: T5) : T6;
+      var X : INTEGER; (* hides X in P1 *)
+      ...
+      begin (* body of F1 *) end;
+      ...
+    begin... (* body of P4 *)
+    end;
+    ...
+  begin (* body of P1 *) end.
+\end{verbatim}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Nested Subroutines}
+
+\begin{itemize}
+
+\item Inner declaration of a name {\em hides} or {\em shadows} a outer
+  declaration of the same name; we say there is a \textit{hole} in the
+  outer scope.
+
+
+\item Some languages like Ada allow syntax like \verb@P1.X@ to refer
+to hidden declarations in an outer scope.
+
+\item In C++, \verb@::X@ refers to global \verb@X@, irrespective of
+  any local variables names \verb@X@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Access to Nonlocal Entities}
+
+\begin{itemize}
+
+\item Local entities accessible via stack frame.
+
+\item Since a subroutine is only visible to routines in the same scope or
+  nested scopes, non local entities must be available in an earlier stack
+  frame.
+
+\item Keep track of the difference in depth between the current subroutine
+and non-local subroutine to find stack frame for non-local subroutine.
+
+\item In the presence of recursion, we need a {\em static chain} which
+links latest stack frames for each depth from inner to outer.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Access to Non-Local Entities}
+
+\begin{figure}
+\includegraphics[width=90mm]{figs/3-05}\\
+Static Chains
+\end{figure}
+
+\end{frame}
+
+\begin{frame}[fragile]{Declaration Order}
+
+\begin{itemize}
+
+\item Does the scope of a declaration begin at the point of declaration
+(C, Java) or at the start of the block containing the declaration (Pascal).
+
+\item Many languages require {\em declaration before use} for local
+  variables.
+
+\item Pascal requires declaration before use for functions/procedures.
+  Mutual recursive routines need {\em forward declarations}.  Facilitates
+  \textit{single-pass} compilation.
+
+\item Java, C++ allow class members to be visible in all methods
+  irrespective of declaration order; classes can be declared in any order
+  and still refer to each other.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{A Pascal Anomaly}
+
+Pascal defines scope of declaration as procedure containing declaration and it
+also requires declaration before use.  Results in the following anomaly
+(many Pascal compilers do not catch this error):
+
+\begin{verbatim}
+const N = 10;
+...
+procedure foo;
+const 
+  M = N; (* semantic error because 
+            use before declaration *)
+  ...
+  N = 20; (* declaration which hides outer N *)
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Declaration Order Immaterial}
+
+\begin{itemize}
+
+\item In Modula-3, scope of declaration is entire block in which declaration
+  occurs (modulo holes); declaration order does not matter.  Hence one
+  declaration can refer to a variable in a subsequent declaration.
+
+\item Scripting language Python does not have any declarations.  If there is
+  assignment to some local variable, then that is taken as
+a declaration of S.  However a reference to the variable before the
+  assignment will trigger a \verb@NameError@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Javascript Variable Hoisting}
+
+\begin{itemize}
+
+\item Variables declared using \texttt{let} act like traditional
+  block-scoped variables.
+
+\item Variables declared using \texttt{var} are hoisted to start of
+function.
+
+\item Variable hoisting can cause surprising behavior.
+
+\item Traditionally Javascript had only \texttt{var} declarations;
+  \texttt{let} was added later.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Javascript Variable Hoisting Example}
+
+In \href{./programs/let-var.js}{let-var.js}
+
+@pre{jsfile}[begintag=@use_var_begin@,endtag=@use_var_end@]{let-var.js}
+
+@pre{jsfile}[begintag=@use_let_begin@,endtag=@use_let_end@]{let-var.js}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Javascript Variable Hoisting Example Continued}
+
+@pre{jsfile}[begintag=@run_begin@,endtag=@run_end@]{let-var.js}
+
+@pre{jsfile}[begintag=@main_begin@]{let-var.js}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Javascript Variable Hoisting Example Log}
+
+\begin{verbatim}
+$ ./programs/let-var.js 
+using var
+i = 5
+i = 5
+i = 5
+i = 5
+i = 5
+using let
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+$
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Declarations versus Definitions}
+
+\begin{itemize}
+
+\item In C, a entity can be declared multiple times (consistently), but can
+  be defined only once.
+
+\item A function with a body constitutes a definition of the function.
+
+\item A global variable constitutes a definition depending on the
+  initialization model.  Safest to give it a initializer to make it a
+  definition.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Declaration versus Definition in C}
+
+In header file:
+\begin{ccode*}{}
+struct Stack; /* declaration */
+
+void pushStack(struct Stack *stack, int value);
+int popStack(struct Stack *stack);
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Declaration versus Definition in C Continued}
+In implementation file:
+\begin{ccode*}{}
+enum { MAX_STACK = ... };
+struct Stack { /* definition */
+  int stackIndex;
+  int contents[MAX_STACK];
+}
+void pushStack(struct Stack *stack, int value) {
+  ... 
+}
+int popStack(struct Stack *stack) { ... }
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Declaration Statements}
+
+\begin{itemize}
+
+\item Pascal allows local declarations only at start of a subroutine.  
+
+\item Algol 60, C89 and Ada allow local declarations only at the start of a block.
+
+\item Algol 68, C9x. Java, C\# allow local declarations anywhere where a
+statement may appear (Java, C\# make it illegal to hide outer local
+declarations).  This facilitates locality and initialization during
+declaration.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Information Hiding}
+
+\begin{itemize}
+
+\item Minimize visibility of entities to portions of program which do not
+  need them.
+
+\item Reduces {\em congitive load} on the programmer by reducing the amount
+  of information required to understand any portion of the program.
+
+\item The use of a local \verb@static@ declaration as in the \verb@rand()@
+  example ensures that \verb@seed@ is not visible outside \verb@rand@.  
+
+\item Information hiding provided by block-scope is limited.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Modules}
+
+\begin{itemize}
+
+\item A {\em module} is collection of entities (subroutines, variables,
+  types, etc.) which are encapsulated such that entities within the module
+  are visible to each other but are not visible outside the module unless
+  explicitly {\em exported}.  Entities external to the module may not be
+  visible unless explicitly {\em exported}.
+
+\item Modules can be found in Modula 1, 2, 3,  CLU ({\em clusters}), Turing,
+Ada ({\em packages}), C++ ({\em namespaces}), Java ({\em packages}).
+
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Separate Compilation}
+
+\begin{itemize}
+
+\item Modules consist of a \alert{declaration part} or \alert{header} and an
+\alert{implementation part} or \alert{body}.
+
+\item Module clients need only the header and are independent of the body.
+
+\item Because of consequent information hiding, the body can be
+reimplemented without changing module clients.
+
+\item Usually module type is exported in header as a {\em pointer} or {\em
+  reference} to an {\em opaque} structure.  Since size of a
+  pointer/reference is fixed, clients can be compiled without needing to
+  know details of module type.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Modules in C}
+
+C has no explicit module support.  However, it is possible to implement modules
+by following some conventions:
+
+\begin{itemize}
+
+\item For each module \textit{module}, have a specification 
+  \textit{module}\texttt{.h} file which simply declares the types and
+  functions exported by the module.
+
+\item For each module \textit{module}, have a implementation
+  \textit{module}\texttt{.c} file which implements the types and
+  functions exported by the module.  Private functions/data for the
+  module should be declared using the \texttt{static}
+  storage-specifier which ensures that the declarations are local to
+  the implementation file.
+
+\item Types whose details are not required externally can be declared
+  using a opaque \texttt{struct} declaration.  This is possible if
+  module function parameters or return values only use pointers to
+  the type.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{C Specification of Single Instance Stack}
+
+\begin{ccode*}{}
+typedef void *Element; //generic type 
+
+//push element onto single stack instance
+void push(Element element);
+
+//return element popped from single stack instance
+Element pop();
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{C Implementation of Single Instance Stack}
+
+\begin{ccode*}{}
+enum { MAX_SIZE = ... };
+
+//static var's not visible outside file
+static Element stack[MAX_SIZE];
+static int top = 0;
+
+void push(Element element) { ... }
+Element pop() { ... }
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{C Specification of Multiple Instance Stack}
+
+\begin{ccode*}{}
+typedef void *Element; /* generic type */
+struct Stack; //opaque type
+
+//constructor: allocate and return initialized stack
+struct Stack *newStack();
+
+//destructor
+void freeStack(struct Stack *stack);
+
+//push element onto stack
+void push(struct Stack *stack, Element element);
+
+//return element popped from stack
+Element pop(struct Stack *stack);
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{C Implementation of Multiple Instance Stack}
+
+\begin{ccode*}{}
+enum { MAX_SIZE = ... };
+struct Stack { //define opaque type
+  int top;
+  Element stack[MAX_SIZE];
+}
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{C Implementation of Multiple Instance Stack Continued}
+
+\begin{ccode*}{}
+struct Stack *newStack() {
+  struct Stack *stack = 
+    malloc(sizeof(struct Stack));
+  stack->top = 0;
+  return stack;
+}
+
+void freeStack(struct Stack *stack) {
+  free(stack);
+}
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{C Implementation of Multiple Instance Stack Continued}
+\begin{ccode*}{}
+void push(struct Stack *stack, Element element) {
+  if (stack->top < MAX_SIZE) {
+    stack->stack[stack->top++] = element;
+  }
+  else error();
+}
+
+Element pop(struct Stack *stack) {
+  if (stack->top > 0) {
+    return stack->stack[--stack->top];
+  }
+  else error();
+}
+\end{ccode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Open versus Closed Scopes}
+
+\begin{itemize}
+
+\item Scopes into which all names from external scopes are automatically
+imported are {\em open scopes}.
+
+\item Scopes into which names from external scopes must be explicitly
+  imported are {\em closed scopes}.  Hence modules are closed scopes.
+
+\item Nested subroutines and blocks are open scopes in most Algol family
+  languages.  
+
+\item Languages like Java, C\#, Ada have {\em selectively open scopes}.
+  Exported symbol \verb@foo@ in module/package \verb@A@ can be accessed in client
+as \verb@A.foo@, or simply as \verb@foo@ if explicitly imported.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Dynamic Scope}
+
+\begin{itemize}
+
+\item With {\em dynamic scope}, the current binding for a given name is the
+  one encounted most recently during {\em execution} and not yet destroyed
+  by returning from its scope.
+
+\item Depends on the flow of control at run-time and on the order in which
+  subroutines are called.
+
+\item Languages with dynamic scope include classical Lisp, APL, Perl (before
+  Perl 5 which allows static scope), Snobol.
+
+\item Scheme, Common Lisp are statically scoped, though the latter allows
+optional dynamic scope via {\em special variables}.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Dynamic vs Static Scope: Perl Example}
+
+@pre{perlfile}[begintag=@1@,endtag=@2@]{static-dynamic.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{Dynamic vs Static Scope: Perl Example Continued}
+
+@pre{perlfile}[begintag=@2@]{static-dynamic.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{Dynamic vs Static Scope: Perl Example Log}
+
+\begin{verbatim}
+$ ./programs/static-dynamic.pl 
+before f(): static=2, dynamic=2
+in h() called from main::f: static=2, dynamic=3
+after f(): static=2, dynamic=2
+in h() called from main::go: static=2, dynamic=2
+$
+\end{verbatim}  
+\begin{itemize}
+
+\item When \verb@h()@ called from \verb@f()@, it accesses value of
+  \verb@$dynamic@ defined in \verb@f()@.
+
+\item Once \verb@f()@ returns, \verb@$dynamic@ automatically restored to its
+  previous value.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Dynamic Scope Tradeoffs}
+
+\begin{itemize}
+
+\item Allows customization of routines at run time.  For example,
+  \verb@printInteger()@ with base set by run time variable \verb@printBase@.
+Default \verb@printBase@ to \verb@10@ with callers who want different base
+setting it appropriately.
+
+\item Difficult to understand program without understanding dynamic flow.
+
+\item Use a static \verb@printBase@ with callers who want non-default value
+setting and restoring value.  Dynamic scope provides automatic restore.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Scope Implementation}
+
+\begin{itemize}
+
+\item Have a symbol table which maintains mapping between names and
+information about the entity bound to that name.
+
+\item Very often, information is never deleted from symbol table (LeBlanc
+  and Cook approach).
+
+\item Operations on symbol table include \verb@lookup(String name)@,
+\verb@add(String name, SymInfo info)@, \verb@beginScope()@ and
+\verb@endScope()@.  
+
+\item Give each scope a number and use a {\em scope stack} to denote current
+referencing environment.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Association Lists for Dynamic Scope}
+
+\begin{itemize}
+
+\item Association list or {\em alist} is a list of pairs, giving
+  bindings for identifiers.  The current value of a identifier is the
+  first value found when searching down the list.
+
+\item When execution enters/leaves a scope, bindings for the names defined
+within that scope are pushed/popped onto the alist.
+
+\item Scope entry/exit relatively efficient; lookup can be inefficient.
+
+\item Called {\em deep binding} by Lisp implementers because lookup can
+be deep.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Table for Dynamic Scope}
+
+\begin{itemize}
+
+\item Have a table with a slot for each name with each slot containing a stack
+of bindings for that name.
+
+\item Name lookup is easy: at head of stack associated with the slot for the
+  name.  
+
+\item Entry/exit of scope is more complex as it involves pushing/popping
+entries at the slots for all names defined in that scope.
+
+\item Called {\em shallow binding} by Lisp implementers because lookup is
+shallow.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Deep versus Shallow Binding}
+
+Under dynamic scope:
+
+\begin{itemize}
+
+\item When a function is passed as a parameter, when is its referencing
+environment created?
+
+\item If the referencing environment is created when the reference
+is created then we have {\em deep binding}.
+
+\item If the referencing environment is created when the function is
+actually called then we have {\em shallow binding}.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Program for Binding Rules}
+
+\begin{verbatim}
+typedef struct 
+   ...
+   age : integer
+   ...
+} Person;
+int threshold;
+Person[] people;
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Program for Binding Rules Continued}
+
+\begin{verbatim}
+boolean olderThan(const Person &p) {
+  return p.age > threshold;
+}
+void printPerson(const Person &p) {
+  /* use lineLength; */
+}
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Program for Binding Rules Continued}
+
+\begin{verbatim}
+void 
+printSelectedPeople(Person[] people, 
+                    boolean (*pred)(Person),
+                    void (*print)(Person&)) {
+  int lineLength = (istty(stdin)) ? 80 : 132;
+  foreach (Person p : people) {
+    if (pred(p)) print(p);
+  }
+}
+
+printSelectedPeople(people, olderThan, 
+                    printPerson);
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Deep versus Shallow Binding}
+
+Under dynamic scope:
+
+\begin{itemize}
+
+\item For \verb@lineLength@ need last binding of \verb@lineLength@: {\em
+  shallow binding}.
+
+\item For \verb@threshold@ need value when \verb@olderThan@ is defined:
+{\em deep binding}.
+
+\item The need for deep binding in early dynamically scoped Lisp's was
+  referred to as the {\em funarg problem}.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Closures}
+
+\begin{itemize}
+
+\item When a function is returned in a lexically-scoped programming
+  language, returned value must retain a reference to the environment
+  within which returned function is defined.
+
+  \item A \alert{closure} is a pair $\langle\mbox{code-pointer},
+    \mbox{env-pointer}\rangle$.
+
+\item Since alists are non-destructive, closure can be easily represented
+using alists, with referencing environment pointing to alist giving
+environment when closure is created.
+
+\item For table approach, need to build environment containing first
+  entry of every slot in table, though optimizations are possible.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Deep Binding in Pascal}
+
+\begin{verbatim}
+program binding(input, output);
+procedure A(I:integer; procedure P);
+  procedure B;
+    begin writeln(I); end;
+  begin (* A *)
+    if I > 1 then P else A(2, B);
+  end;
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Deep Binding in Pascal Continued}
+
+\begin{verbatim}
+procedure C; begin end;
+begin (* main *)
+  A(1, C);
+end.
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Deep Binding in Pascal Continued}
+
+\begin{itemize}
+
+\item The value of \verb@I@ used is that in effect when closure for \verb@P@
+  is created in initial invocation of \verb@A@: 1.
+
+\item A closure in statically-scoped language captures current instance when
+closure is created.
+
+\item When closure's routine called, it uses captured instances, even though
+there may be newer instances created by recursive calls.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Class of Values}
+
+\begin{description}
+
+\item[First-class Values:] Can be passed as a subroutine parameter, returned
+  from a subroutine, stored in a variable, and optionally, be created at run
+  time.  Eg: integers and characters in most programming languages.
+
+\item[Second-class Values:] Can be passed as a subroutine parameter, but
+  cannot be returned from a subroutine or assigned to a variable.  Eg:
+  subroutines in most programming languages.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Class of Values}
+
+\begin{description}
+
+\item[Third-class Values:] Cannot be passed as subroutine parameter or
+  returned by subroutine or assigned to a variable.  Eg: labels in most
+  programming languages.
+
+\end{description}
+
+Most functional languages have subroutines as first-class values.
+
+\end{frame}
+
+\begin{frame}[fragile]{First-Class Functions with Static Scope}
+
+\begin{itemize}
+
+\item If a function is returned from another function, then we need to
+  preserve the referencing environment.
+
+\item Hence a language with first-class functions needs to have locals
+with {\em unlimited extent}, conceptually allocated on the heap.
+
+\item Most imperative languages use stack-based allocation for local.  Avoid
+  above problems by language restrictions: no nested routines for C, C++,
+  Fortran, Modula-2 allows references only to outermost subroutines,
+  Modula-3 only allows outermost subroutines as return values.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Balance Program}
+
+In Ruby program \href{./programs/balance.rb}{balance.rb}:
+
+@pre{perlfile}[begintag=@1@]{balance.rb}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Balance Program Log}
+
+\begin{verbatim}
+$ ./programs/balance.rb 
+76
+170
+50
+$
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Balance Program Retrospecive}
+
+\begin{itemize}
+
+\item Closures can be used to achieve same kind of encapsulation as
+typed-modules.
+
+\item This style of programming is encouraged in the seminal
+\href{http://mitpress.mit.edu/sicp/full-text/book/book.html}{\em Structure
+and Interpretation of Computer Programs}.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Aliases}
+
+\begin{itemize}
+
+\item Multiple names ({\em aliases}) refer to a single entity within a single
+scope.
+
+\item Aliases introduced with \verb@COMMON@ and \verb@EQUIVALENCE@
+  statements in Fortran; variant records and \verb@union@'s in languages in
+  Pascal and C.
+
+\item Aliasing situations often occur implicitly in the presence of {\em
+  references} and {\em pointers}.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{C++ Reference Aliases Example}
+
+\begin{verbatim}
+double sum, sumOfSquares;
+void accumulate(double &x) {
+  sum += x; 
+  sumOfSquares += x*x;
+}
+accumulate(sum);
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{C Potential Pointer Alias Example}
+
+\begin{verbatim}
+int a, b, *p, *q;
+...
+a = *p;
+*q = 3;
+b = *p;  /* can we reused *p from before? */
+\end{verbatim}
+Can we reuse previous value of \verb@*p@.  Only if \verb@*q@ does not
+alias \verb@*p@. 
+\end{frame}
+
+\begin{frame}[fragile]{Alias Analysis in C}
+
+\begin{itemize}
+
+\item Recent sophisticated {\em alias analysis} algorithms have made
+C code run as efficiently as Fortran.
+
+\item C99 allows the programmer to use the \verb@restrict@ keyword to
+declare a no-alias declaration.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Overloading}
+
+\begin{itemize}
+
+\item A single name can reference multiple entities within the same scope.
+
+\item Disambiguation is usually via syntactic or semantic context.
+
+\item Symbol table module in compiler handles overloading by returning list
+  of entities for a name in a particular scope.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Name Spaces in C}
+
+In C, the same name overloading is via \alert{namespaces} which are:
+
+\begin{itemize}
+
+\item Entities (variables), functions, \verb@typedef@ and
+\verb@enum@-constants.
+
+\item Labels.
+
+\item \verb@struct@, \verb@union@ and \verb@enum@ tags.
+
+\item A separate name space for the fields of each \verb@struct@ or
+\verb@union@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{C Namespaces Example}
+
+\begin{verbatim}
+  int f(int a) {
+    typedef struct f {
+      int f;
+      struct f *a;
+    } F;
+    F s;
+    f: /* label */
+    ...
+  }
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Function Overloading}
+
+\begin{itemize}
+
+\item In Java, C++, C\# we can have the same name for different functions
+provided each use can be disambiguated by the number and types of the
+arguments.
+
+\item In Ada, we can have the same name for different functions provided
+  each use can be disambiguated by the number and types of the arguments
+  and the return type.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{C++ Function Overloading}
+
+\begin{verbatim}
+struct Complex { ... };
+enum Base { bin, oct, dec, hex };
+void printNum(int n) ...
+void printNum(int n, Base b) ...
+void printNum(Complex c) ...
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{C++ Function Overloading}
+
+\begin{verbatim}
+int i;
+Complex x;
+printNum(i);      //1st function
+printNum(i, dec); //2nd function
+printNum(x);      //3rd function
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Operator Overloading}
+\begin{itemize}
+
+\item Most programming languages allow binary operator \verb@+@ to refer to
+both integer addition as well as floating-point addition.  Similarly for
+other arithmetic operators.
+
+\item Some languages like C++, Prolog, ML allow programmer to reuse built-in
+operators or define new operators for other functions.  So in C++, it is 
+possible to overload the arithmetic operators to operate on a user-defined
+\verb@Complex@ type.
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{References}
+
+Text, Chapter 3.
+
+\end{frame}
+
+
+\end{document}
+
+
+

@@ -1,0 +1,131 @@
+BODY {
+  background: white;
+  margin: 0;
+  padding 0;
+  text-align: center;
+  font-size: 62.5%;
+}
+
+H1 {
+  color: #527bbd;
+  text-align: center;
+  font-size: 300%;
+  font-weight: bold;
+  padding: 10px;
+  margin: 0;
+}
+
+H2 {
+  color: #527bbd;
+  text-align: center;
+  font-size: 250%;
+  font-weight: bold;
+  padding-bottom: 10px;
+  padding-top: 0;
+  margin: 0;
+}
+
+H3 {
+  color: #527bbd;
+  text-align: center;
+  font-size: 150%;
+  font-weight: bold;
+  padding-bottom: 10px;
+  padding-top: 0;
+  margin: 0;
+}
+
+A {
+  color: blue;
+  text-decoration: underline;
+}
+
+A:visited {
+  color: #336600;
+}
+
+A:hover{
+  color: fuchsia;
+}
+
+EM {
+  font-style: italic;
+  color: navy;
+}
+
+DD, LI {
+  padding-bottom: 1ex;
+}
+
+STRONG {
+  font-weight: bold;
+  color: #083194;
+}
+
+TT {
+  color: navy;
+}
+
+DT {
+ font-style: italic;
+ padding-left: 2ex;
+}
+
+#page {
+  font-size: 1.4em;
+  width: 56em;
+  max-width: 95%;
+  margin: 10px auto;
+  text-align: left;
+  padding: 0;
+  overflow: auto;
+  background: #c0c0c0;
+}
+
+#header {
+  padding: 10px;
+  background: #c0c0c0;
+  margin: 0;
+}
+
+#main {
+  float: right;
+  width: 78%;
+  max-width: 78%;
+  background: #fff;
+}
+
+#content {
+  padding: 20px 15px 30em; 15px;
+}
+
+#nav {
+  background: #c0c0c0;
+  width: 20%;
+  max-width: 20%;
+  padding-top: 15px;
+  height: 100%;
+  float: left;
+}
+
+
+#nav LI {
+  list-style-image: url(images/sidearrow.gif);
+  padding-bottom: 1em;
+  margin: 0;
+}
+
+#footer {
+  clear: both;
+  background: #fff;
+}
+
+#announce DT {
+  font-weight: bold;
+}
+
+CODE {
+  font-family: "Courier New" Courier monospace;
+  font-size: 90%;
+  font-weight: bold;
+}

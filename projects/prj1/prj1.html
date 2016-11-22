@@ -1,0 +1,397 @@
+<html>
+<head>
+<title>Project 1: Recursive-Descent Parser </title>
+</head>
+<body bgcolor="#ffffff">
+<h1 align="center">Project 1: Recursive-Descent Parser </h1>
+<p>
+<b>Due Date</b>: 9/21 by 11:59p
+</p>
+<p>
+<b>Important Reminder</b>: As per the course Academic Honesty Statement,
+cheating of any kind will minimally result in receiving an F letter
+grade for the entire course.
+</p>
+<h2>Aims of This Project</h2>
+<p>
+The aims of this project are as follows:
+</p>
+<ul>
+<p><li>
+To familiarize you with recursive-descent parsing.
+</p>
+<p><li>
+To expose you to Java programming.
+</p>
+<p><li>
+To provide familiarity with the tools used to build programs
+    on the <tt>remote.cs</tt> Linux systems.
+</p>
+</ul>
+<h2>Project Specification</h2>
+<p>
+A <b>ugly-regexp</b> is defined inductively as follows:
+</p>
+<ul>
+<p><li>
+A <i>primitive</i> ugly-regexp is <tt>chars(</tt><i>x_1</i><tt>,</tt> <i>...</i><tt>,</tt><i>x_n</i><tt>)</tt> with
+    <i>n</i> <tt>&gt;= 1</tt>.  The <tt>chars</tt> and the comma <tt>,</tt> occur literally, whereas
+    the <i>x_1</i>, <i>...</i>, <i>x_n</i> represent any single character.  A <tt>chars</tt>
+    ugly-regexp represents the character class containing the characters
+    <i>x_1</i>, <i>...</i>, <i>x_n</i>.
+</p>
+<p><li>
+If <i>U1</i> and <i>U2</i> are ugly-regexp's, then so are:
+<ul>
+<p><li>
+<tt>(</tt> <i>U1</i> <tt>)</tt> representing the same ugly-regexp as <i>U1</i>.
+</p>
+<p><li>
+<tt>*</tt> <i>U1</i> representing the Kleene closure of ugly-regexp <i>U1</i>.
+</p>
+<p><li>
+<i>U1</i> <tt>+</tt> <i>U2</i> representing the alternation of ugly-regexp's
+        <i>U1</i> or <i>U2</i>.
+</p>
+<p><li>
+<i>U1</i> <tt>.</tt> <i>U2</i> representing the concatenation of ugly-regexp's
+        <i>U1</i> and <i>U2</i>.
+</p>
+</ul>
+</p>
+</ul>
+<p>
+The operators precedences are strictly ordered <tt>.</tt> (lowest), <tt>+</tt>, <tt>*</tt>
+(highest).  The <tt>.</tt> and <tt>+</tt> binary operators are left-associative.
+The <tt>*</tt> prefix operator is allowed to nest, i.e., <tt>**</tt><i>U1</i> is legal.
+Parentheses are used in the usual way to override the default
+associativity and precedence.
+</p>
+<p>
+An ugly-regexp is terminated by a newline.  Other linear-whitespace
+(spaces or tabs) should be ignored.  It is assumed that an ugly-regexp
+contains only ASCII characters.
+</p>
+<p>
+Examples of legal ugly-regexp's, followed by a <tt>#</tt>-comment
+containing the equivalent regexp in <i>"</i>standard<i>"</i> syntax:
+</p>
+<pre>
+    chars(a, b)                                 #[ab]
+    chars(,, ))                                 #[\,\)]
+    chars(a, b) + chars(1, 2) . chars(3, 4)     #([ab]|[12])[34]
+    chars(a, b) + **(chars(1, 2) . chars(3, 4)) #[ab]|([12][34])**
+</pre>
+<p>
+[<b>Note</b>: the <tt>#</tt>-comment comment above is <b>not</b> the translation your
+program is required to produce.]
+</p>
+<p>
+An ugly-regexp <i>U</i> can be translated into standard regexp syntax using
+a translation function <i>T(U)</i> which is defined as follows:
+</p>
+<ul>
+<p><li>
+If <i>U</i> is of the form <tt>chars(</tt><i>x_1</i><tt>,</tt> <i>...</i><tt>,</tt><i>x_n</i><tt>)</tt>, then
+    <i>T(U)</i> is <tt>[</tt><i>x_1...x_n</i><tt>]</tt>.  If any <i>x_i</i> is not a letter or
+    a digit, then it must be escaped by preceeding it with a single
+    backslash character <tt>\</tt>.
+</p>
+<p><li>
+If <i>U</i> is of the form <tt>(</tt> <i>U1</i> <tt>)</tt>, then <i>T(U)</i> is
+    <tt>(</tt><i>T(U1)</i><tt>)</tt>.
+</p>
+<p><li>
+If <i>U</i> is of the form <tt>*</tt> <i>U1</i>, then <i>T(U)</i> is <i>T(U1)</i><tt>*</tt>.
+</p>
+<p><li>
+If <i>U</i> is of the form <i>U1</i> <tt>+</tt> <i>U2</i>, then <i>T(U)</i> is <tt>(</tt><i>T(U1)</i><tt>|</tt><i>T(U2)</i><tt>)</tt>.
+</p>
+<p><li>
+If <i>U</i> is of the form <i>U1</i> <tt>.</tt> <i>U2</i>, then <i>T(U)</i> is <tt>(</tt><i>T(U1)T(U2)</i><tt>)</tt>.
+</p>
+</ul>
+<p>
+You are required to write a java8 program which will parse a ugly-regexp
+and translate it into standard regexp syntax.  Specifically, submit a
+<tt>prj1.tar.gz</tt> archive, which when unpacked into an empty directory on
+the <tt>remote.cs</tt> machines, will build a <tt>target/prj1.jar</tt> jar-file when given
+the command <tt>make</tt>.  When the generated jar-file is run using the command:
+</p>
+<blockquote>
+<p>
+   <tt>$ java -cp target/prj1.jar edu.binghamton.cs571.UglyRegexpParser</tt> <i>FILENAME</i>
+</p>
+</blockquote>
+<p>
+will read ugly-regexp's from <i>FILENAME</i> (one-per-line) and output the
+translation of each ugly-regexp on standard output followed by a
+newline.  The program should read from standard input if <i>FILENAME</i> is
+specified as a single dash <tt>-</tt>.
+</p>
+<p>
+Additionally, the submitted <tt>prj1.tar.gz</tt> archive <b>must</b> contain a
+<tt>README</tt> file which should minimally contain your name, B-number and
+email.  Additionally, it may contain the status of your project and
+any other information you believe is relevant.
+</p>
+<h2>Rationale for the Requirements</h2>
+<p>
+This is basically a <i>"</i>make-work<i>"</i> project in that a ugly-regexp is
+not particularly useful.  The rationales for the idiosyncratic syntax
+included the following:
+</p>
+<ul>
+<p><li>
+The relative precedence of the alternation and concatentation
+    operators in ugly-regexp's differs from that in standard regexp
+    syntax.  This makes it impossible to do the translation using
+    simple string replacement and requires writing a full parser.
+</p>
+<p><li>
+Similar considerations led to the use of a prefix rather than
+    suffix Kleene-closure operator <tt>*</tt>.
+</p>
+<p><li>
+The translation introduces possibly redundant parentheses (in the
+    translations for parentheses, alternation, concatenation).  This
+    simplifies the translation function considerably.
+</p>
+<p><li>
+Since whitespace is ignored, the ugly-regexp syntax does not allow
+    any kind of whitespace characters within the constructed regexp's.
+    This simplifies the scanner slightly.
+</p>
+</ul>
+<h2>Example Log</h2>
+<p>
+Here is an annotated log of an interactive session with the program:
+</p>
+<pre>
+$ java -cp target/prj1.jar edu.binghamton.cs571.UglyRegexpParser -
+chars(a, b)
+[ab]
+* chars(,,)
+&lt;stdin&gt;:2:11: syntax error at '      #syntax error at newline with newline
+', expecting ')'                     #quoted within single-quotes
+* chars(,)
+[\,]*
+chars(a) + chars(b) . chars(c)       #+ binds tighter than .
+(([a]|[b])[c])
+chars(a) + (chars(b) . chars(c))
+([a]|(([b][c])))                     #double paren due to paren &amp; . translation
+chars(a) + (chars(b) . *chars(c))
+([a]|(([b][c]*)))
+chars(a) + * * (chars(b) . chars(c)) # *'s nest
+([a]|(([b][c]))**)
+(chars(a,))                          #) after comma treated as chars char
+&lt;stdin&gt;:8:11: syntax error at '
+', expecting ')'
+(chars(a,)))                         #fixed here
+([a\)])
+$
+</pre>
+<p>
+Note that EOF is signalled to the Unix terminal-controller by typing
+a control-D character.
+</p>
+<h2>Provided Files</h2>
+<p>
+The <a href="./files">./files</a> directory contains the following:
+</p>
+<dl>
+<p><dt><a href="./files/Makefile">Makefile</a><dd>
+    This file assumes that the project is set up to be built
+    using a ant <tt>build.xml</tt> build-file.  Simply typing
+    <tt>make</tt> will build the project, <tt>make clean</tt> will
+    remove all generated artifacts and <tt>make submit</tt> will
+    create a <tt>prj1.tar.gz</tt> archive containing the files
+    to be submitted.
+</p>
+<p>
+    You may edit this file if you choose to use a different
+    organization for your project.  When editing, watch out for tabs
+    (the first character of any command-line <b>must be a tab
+    character</b>).
+</p>
+<p><dt>An ant <a href="./files/build.xml">buildfile</a><dd>
+    This ant build-file compiles all source files from the <tt>src</tt>
+    directory.  It generates<tt>.class</tt> files in the <tt>build</tt> directory
+    and <tt>.jar</tt> files in the <tt>target</tt> directory.
+</p>
+<p><dt><a href="./files/README">README</a><dd>
+    A template README; replace the <tt>XXX</tt> with your name, B-number and
+    email.  You may add any other information you believe is relevant
+    to your project submission.  In particular, you should document
+    the data-structure used for your word-store.
+</p>
+<p><dt><tt>src</tt><a href="./files/src/"> </a><dd>
+     Source files which contain all the code necessary for the
+     project except for the guts of the regular expression parsing.
+     Specifically it provides the following java classes (ordered
+     from the bottom-up):
+</p>
+<dl>
+<p><dt><a href="./files/src/edu/binghamton/cs571/Coords.java">Coords</a><dd>
+         Essentially a <tt>struct</tt> which tracks the source position
+         (filename, line-number, column-number) of a token.
+</p>
+<p><dt><a href="./files/src/edu/binghamton/cs571/Token.java">Token</a><dd>
+         Essentially a struct which defines a token.  The
+         implementation file also contains a <tt>Token.Kind</tt> <tt>enum</tt> which
+         defines all the different types of tokens for this project.
+</p>
+<p><dt><a href="./files/src/edu/binghamton/cs571/Scanner.java">Scanner</a><dd>
+         A very crude scanner which delivers tokens of kind <tt>Token.Kind</tt>
+         while ignoring linear whitespace.
+</p>
+<p><dt><a href="./files/src/edu/binghamton/cs571/UglyRegexpParser.java">UglyRegexpParser</a><dd>
+         A skeleton file which will need to be completed by you.  It
+         contains the necessary <tt>main()</tt> function for your program as
+         well as all error handling and utility functions for parsing
+         and translation.
+</p>
+</dl>
+</dl>
+<h2>Hints</h2>
+<p>
+You may choose to follow the following hints (they are not by any
+means required).  They assume that you are using the project structure
+supported by the provided <a href="./files/Makefile">Makefile,</a> and ant
+<a href="./files/build.xml">buildfile</a>.
+</p>
+<p>
+Note that ugly-regexp's treat characters like <tt>(</tt>, <tt>)</tt>, <tt>,</tt>, <tt>.</tt> and <tt>+</tt>
+in two different ways:
+</p>
+<ol type="1">
+<p><li>
+As meta-characters.  For example, <tt>.</tt> is used as a meta-character
+      denoting concatenation.
+</p>
+<p><li>
+As regular characters when used within <tt>chars()</tt>.  For example,
+      (the first) <tt>,</tt>, <tt>.</tt> and <tt>+</tt> are not meta-characters in
+      <tt>chars(,, ., +)</tt> (the comma's other than the first are
+      meta-characters).
+</p>
+</ol>
+<p>
+A situation like this where the kind of a token depends on the context is handled usually in 2 ways:
+</p>
+<ol type="1">
+<p><li>
+The scanner recognizes such characters as special and delivers them
+      to the parser as special tokens.  Then if the parser sees such
+      a special token being delivered in a context where it should be
+      treated as an ordinary character, it makes adjustments to treat
+      it as a ordinary character.
+</p>
+<p><li>
+The scanner treats such characters simply as regular characters.
+      Then if the parser sees such a character being delivered in a
+      context where it should be treated as a special character, it
+      makes adjustments to treat it as a special character.
+</p>
+</ol>
+<p>
+The provided scanner uses (2).  The <tt>check()</tt> and <tt>match()</tt> utility
+functions provided in the skeleton parser allow an optional <tt>lexeme</tt>
+parameter which permits using the lexeme to guide parsing decisions.
+</p>
+<p>
+You may proceed as follows:
+</p>
+<ol type="0">
+<p><li>
+Review material on regexp's, cfg's and recursive-descent parsers.
+     Make sure you understand the following:
+<ul>
+<p><li>
+The standard syntax of regexp's.
+</p>
+<p><li>
+How to build a grammar to enforce specific associativity and
+         precedence of operators.
+</p>
+<p><li>
+How to transform a grammar to remove left-recursive rules.
+</p>
+<p><li>
+How to construct a recursive-descent parser given a
+         grammar amenable to recursive-descent parsing.
+</p>
+</ul>
+</p>
+<p><li>
+Construct a grammar for ugly-regexp's which enforces the required
+     associativity and precedence.  You may use the grammars given in
+     the slides as guides; specifically, the grammars for
+     comma-separated <tt>ID</tt>'s and arithmetic expressions may prove to be
+     useful.
+</p>
+<p><li>
+Transform the above grammar to remove left-recursive rules and
+     make it amenable to recursive-descent parsing.
+</p>
+<p><li>
+Add parsing functions to the <tt>UglyRegexpParser</tt> ignoring
+     translation.  Your aim at this step should be to build a
+     recognizer: i.e. if the provided input is syntactically legal
+     then the program should terminate silently; OTOH,
+     if the input is not syntactically legal, the program should
+     output a suitable error message.  Since you are ignoring
+     translation, set up all the parsing functions to simply return
+     <tt>void</tt> or a <tt>null</tt> string.
+<p>
+     It may be best to do this from the bottom-up.  First get <tt>chars()</tt>
+     working, then <tt>*</tt>, <tt>()</tt>, followed by <tt>+</tt> and <tt>.</tt>.
+</p>
+</p>
+<p><li>
+Add translation logic. Make each parsing function return a string
+     which corresponds to the translation of the input recognized by
+     that function.  Some of the parsing functions will need input
+     parameters representing translations of input seen earlier.
+<p>
+     You may use the provided <tt>quote()</tt> function to quote characters
+     within a character class as per the project requirements.
+</p>
+<blockquote>
+<p>
+     [Note: Standard Java practice suggests using mutable structures
+      like <tt>StringBuffer</tt> or <tt>StringBuilder</tt> to concatenate strings;
+      it may be difficult to do so in this program and you should
+      simply use string concatenation using <tt>+</tt>).
+</p>
+</blockquote>
+</p>
+<p><li>
+Test and review your code until it meets all requirements.
+</p>
+</ol>
+<h2>Submission</h2>
+<p>
+You will need to submit a compressed archive file <tt>prj1.tar.gz</tt> which
+contains all the files necessary to build your jar file.
+Additionally, this archive <b>must</b> contain a <tt>README</tt> file which should
+minimally contain your name, email, the status of your project and any
+other information you believe is relevant.
+</p>
+<p>
+If you are using the suggested project structure, then the provided
+<a href="./files/Makefile">Makefile</a> provides a <tt>submit</tt> target which will
+build the compressed archive for you; simply type <tt>make submit</tt>.
+</p>
+<p>
+Note that it is your responsibility to ensure that your submission is
+complete so that simply typing <tt>make</tt> builds the jar file.  To test
+whether your archive is complete, simply unpack it into a empty
+directory and see if it builds and runs correctly.
+</p>
+<p>
+To submit the above archive, please use blackboard by following the
+<tt>Content-&gt;Projects</tt> link.
+</p>
+</body>
+</html>

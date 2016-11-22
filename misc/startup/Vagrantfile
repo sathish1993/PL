@@ -1,0 +1,151 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  config.vm.box = "dhoppe/debian-7.11.0-amd64"
+  config.vm.hostname = 'cs571-vm'
+
+  # Set timezone to US/NY
+  config.vm.provision :shell, :inline => <<-'TZ_SETUP'
+    echo "America/New_York" | \
+    tee /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
+  TZ_SETUP
+
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network "private_network", ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+  config.vm.provider "virtualbox" do |vb|
+    # Display the VirtualBox GUI when booting the machine
+    vb.gui = true
+    vb.name = "cs571-vm"
+    # Customize the amount of memory on the VM:
+    vb.memory = "2048"
+    # Setup sufficient vram for full-screen and/or seamless mode
+    vb.customize ["modifyvm", :id, "--vram", "12" ]
+  end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
+  # such as FTP and Heroku are also available. See the documentation at
+  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
+  # config.push.define "atlas" do |push|
+  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
+  # end
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  config.vm.provision "shell", inline: <<-SHELL
+
+    #http://www.webupd8.org/2014/03/how-to-install-oracle-java-8-in-debian.html
+    JAVA8=/etc/apt/sources.list.d/webupd8team-java.list
+    if [ ! -e $JAVA8 ]
+    then \
+      echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" \
+           > $JAVA8
+      echo \
+       "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" \
+       >> $JAVA8
+      apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+      echo oracle-java8-installer shared/accepted-oracle-license-v1-1 \
+           select true | /usr/bin/debconf-set-selections
+    fi
+
+    apt-get update
+
+    apt-get install -y curl
+
+    apt-get install -y xorg
+
+    apt-get install -y xfce4 
+
+    apt-get install -y gnome-system-tools gnome-terminal
+
+    apt-get install -y chromium-browser
+
+    apt-get install -y emacs
+
+    apt-get install -y vim vim-gtk vim-doc
+
+    apt-get install -y git git-doc git-el git-gui gitk
+
+    apt-get install -y swi-prolog prolog-el swi-prolog-doc 
+
+    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+
+    npm install -g typescript
+
+    apt-get install -y coffeescript coffeescript-doc libjs-coffeescript
+
+    apt-get install -y oracle-java8-installer
+    apt-get install oracle-java8-set-default
+
+    apt-get install -y erlang erlang-examples erlang-mode \
+                       erlang-doc erlang-manpages
+
+    apt-get install -y racket racket-doc
+
+    apt-get install -y clisp clisp-doc gdb slime
+ 
+    apt-get install -y clojure1.4 clojure-contrib
+
+    apt-get install -y hugs haskell-doc haskell-mode
+
+    apt-get install -y ruby
+
+    apt-get install -y golang
+
+    #required for opam 
+    apt-get install -y unzip
+
+    apt-get install -y ocaml
+
+    apt-get install -y camlp4
+
+    apt-get install -y ocaml-compiler-libs
+
+    wget https://raw.github.com/ocaml/opam/master/shell/opam_installer.sh -O - | sh -s /usr/local/bin
+
+    apt-get install -y mono-devel mono-csharp-shell
+      
+  SHELL
+end

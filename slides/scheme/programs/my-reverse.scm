@@ -1,0 +1,5 @@
+(define (my-reverse ls)
+  (if (null? ls)
+      '()
+      (append (my-reverse (cdr ls))
+	      (list (car ls)))))

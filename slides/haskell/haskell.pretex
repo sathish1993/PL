@@ -1,0 +1,1203 @@
+% -*- mode: latex -*-
+% vi: set ft=latex :
+\documentclass{beamer}
+
+%derived from beamer solution generic-ornate-15min-45min.en.tex
+
+\mode<presentation>
+{
+  \usetheme{Warsaw}
+  \setbeamercovered{transparent}
+}
+
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+\usepackage{minted}
+
+\newminted{haskell}{linenos=false}
+\newmintedfile{haskell}{linenos=true}
+
+\title[CS 571: Haskell]{Haskell}
+
+%\subtitle
+%{Presentation Subtitle} % (optional)
+
+%\author[Author, Another] % (optional, use only with lots of authors)
+%{F.~Author\inst{1} \and S.~Another\inst{2}}
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+%\institute[Universities of Somewhere and Elsewhere] % (optional, but mostly needed)
+%{
+%  \inst{1}%
+%  Department of Computer Science\\
+%  University of Somewhere
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+%\date[Short Occasion] % (optional)
+%{Date / Occasion}
+
+%\subject{Talks}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}<beamer>{Outline}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+
+\setbeamertemplate{headline}{}
+
+@begin{include_path}
+  programs
+@end{include_path}
+
+\begin{document}
+
+\begin{frame}[fragile]{Features}
+
+\begin{itemize}
+
+  \item Named after logician Haskell B. Curry (after whom the currying
+    transformation is named).
+
+  \item Pure functional language (imperative features like I/O integrated into a
+    functional framework).
+
+  \item Infix syntax.
+
+  \item Polymorphic static typing.
+
+  \item Equational definitions.
+
+  \item Pattern-matching.
+
+  \item Lazy evaluation (normal-order reduction).
+
+  \item First-class functions.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Currying}
+
+\begin{itemize}
+\item Given a function $f$ of type $f: (X \times Y) \rightarrow Z$, then 
+$\mbox{curry}(f): X\rightarrow (Y\rightarrow Z)$.
+
+\item Currying results in higher-order functions.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Data}
+
+\begin{itemize}
+
+  \item Numbers, including unlimited precision integers.
+
+  \item Characters. \verb@'a'@, \verb@'b'@, $\ldots$.
+
+  \item Strings \verb@"abc"@ equivalent to list of characters.
+
+  \item Lists.  List literals enclosed within square brackets.  Infix
+    \verb@:@ used as list constructor.  Empty list denoted as \verb@[]@.
+    \verb@[1, 2, 3]@ equivalent to \verb@1 : (2 : (3 : []))@.
+
+  \item Tuples.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Factorial Program}
+
+In \href{./programs/factorial.hs}{factorial.hs}
+
+@pre{haskellfile}{factorial.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Factorial Log}
+
+\begin{haskellcode*}{}
+Main> :l "factorial.hs"
+Reading file "factorial.hs":
+
+Hugs session for:
+/usr/local/lib/hugs/lib/Prelude.hs
+factorial.hs
+Main> factorial 0
+1
+Main> factorial 4
+24
+Main> :t factorial
+factorial :: Num a => a -> a
+Main> factorial 3.0
+6.0
+Main>
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Length Program}
+
+
+In \href{./programs/my-length.hs}{my-length.hs}
+
+@pre{haskellfile}{my-length.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Length Log}
+
+\begin{haskellcode*}{}
+Prelude> :l "my_length.hs"
+...
+Main> my_length []
+0
+Main> my_length [1, 2, 3]
+3
+Main> my_length 1
+ERROR - Unresolved overloading
+*** Type       : Num [a] => Int
+*** Expression : my_length 1
+
+Main> my_length ["a"]
+1
+Main>
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Tuples}
+
+Can contain non-uniform types.
+
+\begin{haskellcode*}{}
+Main> (1, 2, 3)
+(1,2,3)
+Main> :t (1, 2, 3)
+(1,2,3) :: (Num a, Num b, Num c) => (c,b,a)
+Main> :t (1, 2, 'a')
+(1,2,'a') :: (Num a, Num b) => (b,a,Char)
+Main> (1, 2, 'a')
+(1,2,'a')
+Main> fst (1, "a")
+1
+Main> snd (1, "a")
+"a"
+Main> 
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Lambda Functions}
+
+\href{./programs/lambda-length.hs}{lambda-length.hs}
+
+@pre{haskellfile}{lambda-length.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Lambda Length Log}
+
+\begin{haskellcode*}{}
+Main> :l "factorial.hs"
+Reading file "factorial.hs":
+
+Hugs session for:
+/usr/local/lib/hugs/lib/Prelude.hs
+factorial.hs
+Main> factorial 0
+1
+Main> factorial 4
+24
+Main> :t factorial
+factorial :: Num a => a -> a
+Main> factorial 3.0
+6.0
+Main>
+\end{haskellcode*}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Type Inference}
+
+\begin{haskellcode*}{}
+Main> :t 12
+12 :: Num a => a
+Main> 12
+12
+Main> :t [1, 2, 3]
+[1,2,3] :: Num a => [a]
+Main> [1, 2, 3]
+[1,2,3]
+Main> :t ["a", "bc", "d"]
+["a","bc","d"] :: [[Char]]
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Type Inference Continued}
+
+\begin{haskellcode*}{}
+Main> ["a", "bc", "d"]
+["a","bc","d"]
+Main> ["a", "1"]
+["a","1"]
+Main> ["a", 1]
+ERROR - Unresolved overloading
+*** Type       : Num [Char] => [[Char]]
+*** Expression : ["a",1]
+
+Main> 
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Lists and Strings}
+
+A string is a list of characters. \verb@++@ used for list and string
+concatenation.
+
+\begin{haskellcode*}{}
+Main> ['h', 'e', 'l', 'l', 'o' ]
+"hello"
+Main> ['h', 'e', 'l', 'l', 'o', ' ' ] ++ "world"
+"hello world"
+Main> length "hello"
+5
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Lists and Strings Continued}
+
+\begin{haskellcode*}{}
+Main> [1, 2, 3] ++ [4, 5]
+[1,2,3,4,5]
+Main> [1, 2, 3] ++ ['a', 'b']
+ERROR - Unresolved overloading
+*** Type       : Num Char => [Char]
+*** Expression : [1,2,3] ++ ['a','b']
+
+Main> 
+\end{haskellcode*}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{List Comprehension}
+
+List comprehension returns a list of elements created by evaluation of
+generators 
+\href{http://www.zvon.org/other/haskell/Outputsyntax/listQcomprehension_reference.html}{Examples}
+
+\begin{haskellcode*}{}
+Main> [x + 2*x + x/2 | x <- [1, 2, 3, 4]]
+[3.5,7.0,10.5,14.0]
+Main>  [ odd x | x <- [1..9]]
+[True,False,True,False,True,False,True,False,True]
+Main> [ x*y | x <- [1,2,3,4], y <- [3,5,7,9]]
+[3,5,7,9,6,10,14,18,9,15,21,27,12,20,28,36]
+Main> [x | x <- [1,5,12,3,23,11,7,2], x>10]
+[12,23,11]
+Main> [(x,y) | x <- [1,3,5], y <- [2,4,6], x<y]
+[(1,2),(1,4),(1,6),(3,4),(3,6),(5,6)]
+Main> 
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Quicksort}
+
+\href{./programs/qsort.hs}{qsort.hs}:
+
+@pre{haskellfile}{qsort.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Quicksort Log}
+\begin{haskellcode*}{}
+Main> :l "qsort.hs"
+...
+Main> qsort [5, 3, 2, 6]
+[2,3,5,6]
+Main> qsort ["c", "d", "abc"]
+["abc","c","d"]
+Main> :t qsort
+qsort :: Ord a => [a] -> [a]
+Main> 
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Higher-Order Functions}
+
+\begin{haskellcode*}{}
+Main> :t map
+map :: (a -> b) -> [a] -> [b]
+Main> map (\x -> x > 4) [1..9]
+[False,False,False,False,True,True,True,True,True]
+Main> map (\x -> x + 4) [1..9]
+[5,6,7,8,9,10,11,12,13]
+Main> :t foldr
+foldr :: (a -> b -> b) -> b -> [a] -> b
+Main> foldr (+) 0 [1, 2, 3, 4] 
+10
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Higher-Order Functions Continued}
+
+\begin{haskellcode*}{}
+Main> foldr (-) 0 [1, 2, 3, 4] 
+-2
+Main> :t foldl
+foldl :: (a -> b -> a) -> a -> [b] -> a
+Main> foldl (+) 0 [1, 2, 3, 4] 
+10
+Main> foldl (-) 0 [1, 2, 3, 4] 
+-10
+Main> foldl (-) 15 [1, 2, 3, 4] 
+5
+Main> foldl (-) (-15) [1, 2, 3, 4] 
+-25
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Higher-Order Functions Continued}
+
+\begin{haskellcode*}{}
+Main> foldl (\x -> \y -> x + length y) 0 
+        ["abc", "d", "ef"]
+6
+Main> foldl (\x -> \y -> length x + y) 0 
+        ["abc", "d", "ef"]
+ERROR - Type error in application
+*** Expression     : foldl (\x -> \y -> length x + y) 0 ["abc","d","ef"]
+*** Term           : \x -> \y -> length x + y
+*** Type           : [a] -> Int -> Int
+*** Does not match : Int -> [Char] -> Int
+
+Main> 
+\end{haskellcode*}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Infinite Lists}
+
+\href{./programs/infinite.hs}{infinite.hs}
+
+@pre{haskellfile}{infinite.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Infinite Lists Log}
+
+\begin{haskellcode*}{}
+Main> :t take
+take :: Int -> [a] -> [a]
+Main> take 5 (numsFrom 3)
+[3,4,5,6,7]
+Main> take 5 squares
+[0,1,4,9,16]
+Main> 
+\end{haskellcode*}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Zip}
+
+\verb@zip@ is a function which turns two lists into a list of 2 tuples.
+\verb@zipWith@ maps a binary function over two lists at once.
+
+\begin{haskellcode*}{}
+Main> zip [1, 2, 3] ["ab", "cd", "ef"]
+[(1,"ab"),(2,"cd"),(3,"ef")]
+Main> zip [1, 2, 3] ["ab", "cd"]
+[(1,"ab"),(2,"cd")]
+Main> zipWith (*) [1, 2, 3] [4, 5, 6]
+[4,10,18]
+Main> zipWith (*) [1, 2, 3] [4, 5]
+[4,10]
+Main> 
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Zip Fibonacci}
+
+\href{./programs/zip-fib.hs}{zip-fib.hs}
+
+@pre{haskellfile}{zip-fib.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Zip Fibonacci Log}
+
+\begin{haskellcode*}{}
+Main> take 10 fib1
+[1,1,2,3,5,8,13,21,34,55]
+Main> take 10 fib2
+[1,1,2,3,5,8,13,21,34,55]
+Main> take 10 fib3
+[1,1,2,3,5,8,13,21,34,55]
+Main> 
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Case and Indentation}
+
+\begin{itemize}
+
+  \item Types start with upper-case letter; non-types with lower-case letter.
+
+  \item Implicit semi-colon at the end of every line, except when continuation
+    lines are indented.
+
+  \item A semi-colon is inserted at EOF or whenever the next line starts in the
+    left-hand margin.
+
+  \item Blocks are indicated by indentation of keywords like where, let, of, do.
+
+  \item New margin is indentation of token after keyword.  Block ends at return
+    to old margin.
+
+  \item Can use explicit braces and semicolons.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Use of Guards}
+
+Guards can be used instead of a top-level \verb@if@ within an equation.
+
+\begin{haskellcode*}{}
+max :: Ord a => a -> a -> a
+max x y
+  | x > y = x
+  | otherwise = y
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Guards with Pattern Matching}
+
+Allows pattern matching within expressions:
+
+\begin{haskellcode*}{}
+my_filter :: (a -> Bool) -> [a] -> [a]
+my_filter p [] = []
+my_filter p (x:xs)
+  | p x = x : my_filter p xs
+  | otherwise = my_filter p xs
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Case Expressions}
+
+\begin{haskellcode*}{}
+my_length :: [a] -> Int
+my_length xs =
+  case xs of
+    [] -> 0
+    (x:xs) -> 1 + my_length xs
+\end{haskellcode*}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Function Composition}
+
+\begin{itemize}
+  \item Composition of two functions $f$ and $g$ is denoted using $f
+    \mbox{\tt .} g$.  $(f \mbox{\tt .} g) x = f (g x)$.
+
+  \item Since function application has higher precedence than composition 
+    operator {\tt .}, \verb@succ . succ 1@ is not \verb@(succ . succ) 1)@, but
+    \verb@succ . (succ 1)@, which will usually result in a type error.
+
+  \item Composition combines 2 functions, whereas application applies a
+    function to a argument.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Typedefs}
+
+Define type synonyms using \verb@type@ keyword.
+
+\begin{haskellcode*}{}
+type Person = (String, String, int)
+donald = ("Donald Duck", "123-45-6789", 63)
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Data Types}
+
+\begin{haskellcode*}{}
+data DayOfWeek = 
+  Sun | Mon | Tue | Wed | Thu | Fri | Sat
+
+data Shape 
+  = Circle (Float, Float) Float
+  | Square (Float, Float) Float
+  | Polygon [(Float, Float)]
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Partial Computation}
+
+\begin{haskellcode*}{}
+data Maybe a 
+  = Nothing
+  | Just a
+\end{haskellcode*}
+
+\begin{itemize}
+
+  \item Can be used to convert a partial function to type \verb@a@ to a total
+    function to \verb@Maybe a@.
+
+  \item \verb@Nothing@ used to indicate failure.
+
+  \item \verb@Just a@ used to indicate success.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Partial Computation Example}
+
+In \href{./programs/safe-division.hs}{safe-division.hs}:
+
+@pre{haskellfile}{safe-division.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Binary Trees}
+
+In \href{./programs/trees.hs}{trees.hs}:
+
+@pre{haskellfile}{trees.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Binary Trees Log}
+
+\begin{haskellcode*}{}
+Main> sumTree (InternalNode (Leaf 1) 2 (Leaf 3))
+6
+(23 reductions, 45 cells)
+Main> sumTree 
+        (InternalNode 
+          (Leaf 1) 2 
+          (InternalNode (Leaf 3) 4 (Leaf 5)))
+15
+(32 reductions, 31 cells)
+Main> 
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{User-Defined Operators}
+
+\begin{itemize}
+
+  \item Operator names consists of special characters
+  \begin{verbatim}!#$%&*+./<=>?@\^|-~\end{verbatim}
+
+  \item Precedence declarations given by {\em fixity declarations}
+    \verb@infixr@ $n$ (right associative), \verb@infixl@ $n$ (left
+    associative), \verb@infix@ $n$ (non-associative) for $n \in 1 \ldots 9$,
+    with 9 being the strongest (function application has precedence level
+    10).
+
+\end{itemize}  
+
+\end{frame}
+
+\begin{frame}[fragile]{Stack Implementation}
+
+From distribution examples:
+
+\begin{haskellcode*}{}
+-- Stacks: using restricted type synonyms
+
+module Stack where
+
+type Stack a = 
+     [a] in emptyStack, push, pop, topOf, isEmpty
+
+emptyStack :: Stack a
+emptyStack  = []
+
+push       :: a -> Stack a -> Stack a
+push        = (:)
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Stack Implementation Continued}
+
+\begin{haskellcode*}{}
+pop        :: Stack a -> Stack a
+pop []      = error "pop: empty stack"
+pop (_:xs)  = xs
+
+topOf      :: Stack a -> a
+topOf []    = error "topOf: empty stack"
+topOf (x:_) = x
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Stack Implementation Continued}
+
+\begin{haskellcode*}{}
+isEmpty    :: Stack a -> Bool
+isEmpty     = null
+
+instance Eq a => Eq (Stack a) where
+    s1 == s2 | isEmpty s1 = isEmpty s2
+             | isEmpty s2 = isEmpty s1
+             | otherwise  = topOf s1 == topOf s2 && 
+                 pop s1 == pop s2
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Permutations}
+
+
+In \href{./programs/permutations.hs}{permutations.hs} taken from
+\href{http://www.haskell.org/pipermail/haskell-cafe/2002-June/003122.html}{here}:
+
+@pre{haskellfile}{permutations.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Permutations Log}
+
+\begin{haskellcode*}{}
+Prelude> :l "permutations.hs"
+...
+Main> permutations []
+[[]]
+(12 reductions, 25 cells)
+Main> permutations [1, 2, 3]
+[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+(184 reductions, 471 cells)
+Main> permutations [1]
+[[1]]
+(24 reductions, 47 cells)
+Main> 
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Edit Distance}
+
+From Thompson:
+
+\begin{haskellcode*}{}
+data Edit
+  = Change Char
+  | Copy
+  | Delete
+  | Insert Char
+  | Kill
+  deriving (Eq, Show)
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Edit Distance Continued}
+
+\begin{haskellcode*}{}
+transform :: String -> String -> [Edit]
+
+transform [] [] = []
+transform string [] = [Kill]
+transform [] string = map Insert string
+transform (a:x) (b:y)
+  | a == b =    Copy : transform x y
+  | otherwise = best [ 
+      Delete : transform x (b:y),
+      Insert b : transform (a:x) y,
+      Change b : transform x y ]
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Edit Distance Continued}
+
+\begin{haskellcode*}{}
+best :: [[Edit]] -> [Edit]
+best [a] = a
+best (a:x)
+  | cost a <= cost b = a
+  | otherwise        = b
+    where b = best x
+
+cost :: [Edit] -> Int
+cost = length . filter (/=Copy)
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Edit Distance Log}
+
+\begin{haskellcode*}{}
+Main> transform "abc1" "ac2"
+[Edit_Copy,Edit_Delete,Edit_Copy,Edit_Change '2']
+(1045 reductions, 1422 cells)
+Main> transform "abcd" "1a2"
+[Edit_Insert '1',Edit_Copy,Edit_Insert 
+ '2',Edit_Kill]
+(7122 reductions, 9088 cells)
+Main> 
+\end{haskellcode*}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Currying}
+
+In \href{./programs/simple.hs}{simple.hs}
+
+\begin{haskellcode*}{}
+simple a b c = a * (b + c)
+
+Hugs> :l "programs/simple.hs"
+Main> :t simple
+simple :: Num a => a -> a -> a -> a
+Main> :t (simple 5)
+simple 5 :: Num a => a -> a -> a
+Main> :t (simple 5 3)
+simple 5 3 :: Num a => a -> a
+Main> :t (simple 5 3 2)
+simple 5 3 2 :: Num a => a
+Main> (((simple 5) 3) 2)
+25
+Main>
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Currying Simplification}
+
+In \href{./programs/listsumprod.hs}{listsumprod.hs}
+
+@pre{haskellfile}{listsumprod.hs}
+
+
+
+In \href{./programs/listsumprod-curry.hs}{listsumprod-curry.hs}
+
+@pre{haskellfile}{listsumprod-curry.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Currying Infix Operators using Sections}
+
+\begin{itemize}
+\item \verb@(x / y)@ is equivalent to a function \verb@f1 x y = x / y@.
+\item \verb@(x /)@ is equivalent to a function \verb@f1 y = x / y@.
+\item \verb@(/ y)@ is equivalent to a function \verb@f1 x = x / y@.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Currying Infix Operators using Sections Log}
+
+\begin{haskellcode*}{}
+Main> (10 / 5)
+2.0
+Main> (10 /) 5
+2.0
+Main> (/ 5) 10
+2.0
+Main> (/) 10 5
+2.0
+Main>
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Another Sections Example}
+
+\href{./programs/posints.hs}{posints.hs}
+
+@pre{haskellfile}{posints.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Reverse Revisited}
+
+\href{./programs/reverse.hs}{reverse.hs}
+
+@pre{haskellfile}{reverse.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Reverse Revisited Continued}
+
+\begin{haskellcode*}{}
+
+rev3:: [a] -> [a]
+rev3 xs = foldl revOp [] xs
+     	  where revOp acc x = x:acc
+
+-- Using flip f x y = f y x defined in Prelude.
+-- revOp acc x = flip (:) acc x
+-- 2 applications of currying simplification: 
+revOp = flip (:)
+rev4 :: [a] -> [a]
+rev4 = foldl (flip (:)) []
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Qualified Types}
+
+\begin{itemize}
+\item We could type \verb@+@ 
+\begin{haskellcode*}{}
+  (+) :: Integer -> Integer -> Integer
+\end{haskellcode*}
+but that would not allow us to add floats, or complex numbers.
+
+\item We would have separate addition functions \verb@addInteger@, 
+\verb@addFloat@, \verb@addComplex@, but that would not be satisfactory.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Qualified Types}
+
+\begin{itemize}
+\item Giving \verb@(+)@ the polymorphic type \verb@a -> a -> a@ would be
+too general, because the type-variable \verb@a@ is implicitly universally
+quantified.
+
+\item Solution is to use a {\em qualified type}: 
+\begin{haskellcode*}{}
+  (+) :: Num a => a -> a -> a
+\end{haskellcode*}
+which is read as ``for all types \verb@a@ that are members of the
+class \verb@Num@, \verb@(+)@ has type \verb@a -> a -> a@''.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Equality}
+
+\begin{itemize}
+\item Equality cannot be computed for all types; for example, one cannot
+determine the equality of two infinite lists or two functions.  Hence
+{\em computational equality} is weaker than {\em full equality}.
+
+\item So we can compute equality for some types but not for others.  We say
+that a type implements equality if it is a member of type type
+class \verb@Eq@ which defines the function: 
+\verb@(==) :: Eq a => a -> a -> Bool@. 
+
+\item \verb@Integer@ and \verb@Char@ are instances of \verb@Eq@. 
+\verb@42 == 43@ and \verb@'a' == 'a'@ are well-typed but 
+\verb@42 == 'a'@ is not.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Equality Continued}
+
+\begin{itemize}
+\item Type constraints can be propagated through polymorphic data types.
+Hence \verb@[10, 12] == [10, 12]@ and \verb@['a', 'b'] == "ac"@ are
+well-typed.  On the other hand, \verb@[10, 12] == "ac"@ is not.
+
+\item Qualified types also propagate through function definitions.  
+Consider \verb@member@ function:
+\begin{haskellcode*}{}
+member x [] = False
+member x (y:ys) = (x == y) || member x ys
+\end{haskellcode*}
+has type \verb@ Eq a => a -> [a] -> Bool@.  
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Defining Type Classes}
+
+\begin{itemize}
+\item In Haskell's {\em Standard Prelude}:
+\begin{haskellcode*}{}
+Class Eq a where
+  (==) :: a -> a -> Bool
+\end{haskellcode*}
+says ``a type \verb@a@ is an instance of the class \verb@Eq@ iff there is
+an operation \verb@(==) :: a -> a -> Bool@ defined on it.''
+
+\item We can say that a particular type are instances of \verb@Eq@:
+\begin{haskellcode*}{}
+instance Eq Integer where
+  x == y = IntegerEq x y
+\end{haskellcode*}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Equality over User Data Types}
+Given
+\begin{haskellcode*}{}
+data Tree a = 
+  Leaf a 
+  | Node (Tree a) (Tree a)
+\end{haskellcode*}
+define equality as:
+\begin{haskellcode*}{}
+instance Eq a => Eq (Tree a) where
+Leaf a == Leaf b = a == b
+Node t1 t2 == Node s1 s2 = t1 == s1 && t2 == s2
+_ == _ = False
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Full Definition of Equality}
+
+Definition of \verb@Eq@ in Haskell's {\em Standard Prelude}:
+\begin{haskellcode*}{}
+class Eq a where
+  (==), (/=) :: a -> a -> Bool
+  x /= y = not (x == y)
+  x == y = not (x /= y)
+\end{haskellcode*}
+defines 2 operations with {\em default methods} for each operator.
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Polymorphism versus Type Classes}
+
+\begin{itemize}
+\item{\em Polymorphism} captures similar structure over different values.
+For example, a sequence of integers, sequence of strings, etc. can be
+captured by a polymorphic {\em List}.
+
+\item{\em Type classes} capture similar operations over different
+structures.  For example, equality of integers, equality of trees, etc. can
+be captured by a class \verb@Eq@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Type Class Inheritance}
+
+\verb@Ord@ inherits all the operations in \verb@Eq@:
+\begin{haskellcode*}{}
+class Eq a => Ord a where
+  (<), (<=), (>), (>=) :: a -> a -> Bool
+  max, min             :: a -> a -> a
+\end{haskellcode*}
+\verb@Eq@ is a super-class of \verb@Ord@.
+
+Note the previous definition of \verb@quicksort@ had type:
+\begin{haskellcode*}{}
+Ord a => [a] -> [a]
+\end{haskellcode*}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Standard Prelude Type Classes}
+
+Some useful type classes contained in the Standard Prelude:
+
+\begin{itemize}
+
+\item \verb@Eq@ for \verb@==@, \verb@/=@.
+
+\item \verb@Ord@ for \verb@<@, \verb@<=@, \verb@>@, \verb@>=@, \verb@max@,
+\verb@min@, \verb@compare@, \verb@Ordering@
+
+\item \verb@Show@ for converting types to character strings.
+
+\item \verb@Read@ for converting character strings to types.
+
+\item \verb@Num@ for numeric types.
+
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Haskell I/O}
+
+\href{./programs/hello.hs}{hello.hs}
+
+@pre{haskellfile}{hello.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Haskell I/O\\Log}
+\begin{haskellcode*}{}
+Main> hello
+Hello, what's your name?
+Tim
+Hello Tim!
+
+Main> :t hello
+hello :: IO ()
+Main> :t putStrLn
+putStrLn :: String -> IO ()
+Main> :t getLine
+getLine :: IO String
+Main>
+\end{haskellcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{I/O Actions}
+
+\begin{itemize}
+
+\item If a return value has type involving \verb@IO@, then it means that
+function has a side-effect.
+
+\item All I/O actions have the type \verb@IO t@.
+
+\item Produces side-effect when {\em performed}, not
+{\em evaluated}.
+
+\item I/O is performed within another I/O action or at the top-level.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{I/O Actions Continued}
+
+\begin{itemize}
+
+\item \verb@do@ allows {\em sequencing} I/O actions.
+
+\item \verb@<-@ is an operator which extracts a value of type \verb@t@
+from \verb@IO t@.  Hence \verb@getLine :: IO String@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Purity}
+
+Restrict side-effects.  \verb@nameToGreet@ below is {\em pure} and has
+type \verb@String -> String@.
+
+\href{./programs/hello2.hs}{hello2.hs}
+
+@pre{haskellfile}{hello2.hs}
+
+\end{frame}
+
+\begin{frame}[fragile]{Lazy I/O}
+
+\begin{itemize}
+
+\item Function \verb@hGetContents :: Handle -> IO String@ returns all
+the contents from current position in Handle.
+
+\item Does not produce any I/O when called.
+
+\item I/O is performed lazily as return value is processed.
+
+\item Can conceptually have all contents of a 4GB file in memory.
+The contents can then be processed using pure functions with I/O
+occurring lazily behind the scenes.
+
+\end{itemize}
+
+
+
+\end{frame}
+
+\begin{frame}[fragile]{References}
+
+
+Hal Daume III, \href{http://hal3.name/docs/daume02yaht.pdf}{Yet Another Haskell Tutorial}.
+
+
+\href{http://www.haskell.org}{haskell.org}.
+Particularly see the 
+\href{http://haskell.org/documentation}{documentation}.
+
+%\href{http://www.zvon.org/other/haskell/Outputglobal/index.html}{Haskell Reference}.
+
+Paul Hudak, {\em The Haskell School of Expression: Learning Functional
+Programming through Multimedia}, Cambridge University Press, 2000.
+
+Bryan O'Sullivan, John Goerzen and Don Stewart, {\em Real World Haskell},
+O'Reilly, 2009.
+
+\href{https://www.schoolofhaskell.com/}{School of Haskell}
+
+Simon Thompson, {\em Haskell: The Craft of Functional Programming}, Second
+Edition, Addison-Wesley, 1999.
+
+\end{frame}
+
+
+\end{document}

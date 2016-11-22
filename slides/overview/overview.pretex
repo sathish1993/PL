@@ -1,0 +1,344 @@
+% -*- mode: latex; -*-
+% vi: set ft=latex :
+\documentclass{beamer}
+
+%derived from beamer solution generic-ornate-15min-45min.en.tex
+
+\mode<presentation>
+{
+  \usetheme{Warsaw}
+  \setbeamercovered{transparent}
+}
+
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+\title[CS 571 Overview]{Overview}
+
+%\subtitle
+%{Presentation Subtitle} % (optional)
+
+%\author[Author, Another] % (optional, use only with lots of authors)
+%{F.~Author\inst{1} \and S.~Another\inst{2}}
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+%\institute[Universities of Somewhere and Elsewhere] % (optional, but mostly needed)
+%{
+%  \inst{1}%
+%  Department of Computer Science\\
+%  University of Somewhere
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+%\date[Short Occasion] % (optional)
+%{Date / Occasion}
+
+%\subject{Talks}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}<beamer>{Outline}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+
+\begin{document}
+
+%\begin{frame}
+%  \titlepage
+%\end{frame}
+
+\section{Motivation}
+
+\begin{frame}[fragile]{Motivation}
+ \begin{itemize}
+\item Explore different abstractions available in different languages.
+
+
+\item Allows choosing language appropriate to problem.
+
+\item Better understanding of languages makes it easier to learn new
+    languages.
+
+\item Become an overall better programmer.
+
+\item Simulate features in languages which lack them.
+
+\item Facilitate better use of language technology in different situations.
+For example, in analyzing structured files or designing
+extension/configuration languages.
+
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Motivation Continued}
+ \begin{itemize}
+\item Understand relatively obscure features like unions in C/C++,
+  multiple-inheritance in C++ and CLOS, multi-dispatching in CLOS,
+  varargs in C/C++.
+
+\item Choose among alternatives.  In C++ use copy constructors to minimize
+  cost of construction.  With poor compilers, choice between \verb@x*x@ versus
+  \verb@x^2@, arrays versus pointers in C.
+
+\item Better understanding aids use of tools like debuggers, assemblers and
+linkers.
+
+
+\end{itemize}
+\end{frame}
+
+\section{History}
+
+\begin{frame}[fragile]{Brief History}
+  \begin{description}
+  \item[Plankalkul:]
+    Konrad Zuse, 1945.  Surprisingly advanced, considering its chronology.
+    Had Eiffel-style assertions.  2-dimensional notation.  Not widely
+    known.  See the Wikipedia 
+    \href{https://en.wikipedia.org/wiki/Plankalk%C3%BCl}{article}.
+
+  \item[Fortran:] 
+    Backus, 1954.  Initially for IBM 704.  Emphasis on {\em formula
+    translation} of mathematical formula to machine language.  Efficiency of
+    execution very important.  Initially had primitive control structures: a
+    indexed \verb@DO@ loop; a 3-way arithmetic \verb@IF@.  Uses a
+    fixed-column format with spaces ignored.  Highly successful and still
+    extremely popular.  Latest version is Fortran 2003.
+
+
+  \end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Brief History Continued}
+
+\begin{description}
+  \item[Lisp:] McCarthy. 1960.  Used for AI and symbolic processing.
+    Only 2 basic data types: {\em atoms} and {\em pairs}.  Functional
+    programming language with imperative features.  Supported
+    recursion.  Simple and regular syntax.  Garbage collection.
+    Programs and data have same syntax: parenthesized postfix.
+    Initially interpreted.  Possible to change program at runtime.
+    Highly successful.  Current versions include Common Lisp and
+    Scheme.
+
+  \item[Cobol:]
+    DoD Committee, 1960.  Used for business applications.  Easy to
+    produce reports.  Hierarchical data structures.  Verbose syntax.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Brief History Continued}
+
+\begin{description}
+  \item[Algol:]
+    International committee, 1960.  Academic origins.  Block structure,
+    recursion, call by value and call by name, local dynamic arrays.
+    Never popular as a programming language but used for communicating
+    algorithms.  Highly influential through its successors Pascal, C, ... .
+
+  \item[APL:]
+    Iverson, 1960.  Array-operators.  Write-only programs.  Reasonably popular
+    for scientific and engineering applications.
+
+  \item[PL/I:]
+    IBM, 1965.  Supposed to be a universal language.  Combination of
+    features from Fortran, Algol and Cobol.  A very complex language.
+    Not terribly successful.
+
+  \item[Snobol:]
+    Griswold, 196x.  Text processing.  Descendent Icon.
+
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Brief History Continued}
+
+\begin{description}
+  \item[Simula:]
+    Nygaard and Dahl, 1967.  Object-oriented features.
+
+  \item[Pascal:]
+    Wirth, 1971.  Simplified Algol.  User-defined data types, records.
+    Almost too simple for practical use without changes.  Widely used
+    for instruction.  Portable implementation using a P-code virtual
+    machine.
+
+  \item[C:]
+    Kernighan and Ritchie, 1972.  Emphasis on systems programming.
+    Low level language (called a {\em portable assembly language}) which
+    has evolved to support fairly high-level features.  Highly successful.
+
+\end{description}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Brief History Continued}
+
+\begin{description}
+  \item[Prolog:]
+    Roussel, 1975.  Programming in Logic.  Origins in automated theorem
+    proving.  Uses a general form of pattern matching for data-structure
+    access and construction.
+	
+  \item[Smalltalk:]
+    Kay, 1980.  Object-oriented language.  Very rich set of libraries
+    and an integrated programming environment.  Relatively widely
+    used at the time.  Extremely influential.
+
+\end{description}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Brief History Continued}
+
+\begin{description}
+  \item[C++:]
+    Stroustrup, 1984.  C with added OO features.  Has evolved into
+    a extremely complex language.  Widely used.
+
+  \item[Java:]
+    Gosling, 1995.  A simpler version of C++.  Got a boost from
+    WWW browsers supporting Java {\em applets} (which never took off).
+    Very popular currently.  
+
+  \item[C$\sharp$:]
+    Microsoft, 2002.  A larger version of Java tied to MS \verb@.NET@
+    platform.  Relatively popular due to MS backing.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Brief History Continued}
+
+  Scripting languages:
+  \begin{description}
+    
+  \item[Perl:] Larry Wall, 1987.  Became very popular with the rise of
+    the WWW in the 1990's.  Weak OO.  Perl 5 still widely used but
+    fading.  Perl 6 (a new language) was introduced after over a decade
+    of development.
+    
+
+  \item[Python:]
+    Guido Van Rossum, around 1990.  OO scripting language.
+    Indentation part of syntax.  Currently most popular scripting
+    language.
+
+  \item[Ruby:]
+    Yukihiro "Matz" Matsumoto, around 1995.  OO scripting language.
+    Minimal syntax, ideal as \alert{internal domain-specific language}.
+    Popularized by Ruby-On-Rails web framework.  Meta-programming.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Brief History Continued}
+
+Recent languages:  
+\begin{description}
+  \item[Go:]
+    Google, 2007.  Statically-typed with implicit typing, scalable
+    language, in the tradition of C.  Duck-typed interfaces instead of
+    inheritance.  Light-weight concurrency.
+
+  \item[Swift:]
+    Apple, 2014.  Replacement for Objective-C.  Rumors of Google
+    using it to replace Java.
+
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Universal Client Language}
+
+As browsers become a universal client, the programming language used
+in most browsers Javascript is becoming the universal client language.
+
+\begin{itemize}
+
+\item Underrated language because of poor browser DOM implementations.
+
+\item Resurgence because of AJAX client applications.
+
+\item Borrows concepts from Scheme and Self.
+
+\item Prototype-based object model without classes.
+
+\item Recent trends for use on server side (nodejs) ... one language
+  on both client and server?
+
+\item Newer languages like coffeescript, typescript, elm implemented
+  by compiling into javascript.
+  
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Universal Target Architectures}
+
+\begin{itemize}
+
+\item Number of general purpose hardware architectures are shrinking:
+  x86, ARM, SPARC, Power-PC, etc.
+
+\item Previously new languages were often compiled to C.
+
+\item Current new languages target the JVM (Scala, JRuby,Jython, Clojure) or
+  the CLR (F\#, Iron Ruby, Iron Python).
+
+\item Java 7 JVM has special support for dynamic languages with
+  addition of {\tt invokedynamic}.
+
+\end{itemize}
+
+\end{frame}
+
+
+
+\end{document}
+
+

@@ -1,0 +1,2235 @@
+% -*- mode: latex -*-
+% vi: set ft=latex :
+\documentclass{beamer}
+
+%derived from beamer solution generic-ornate-15min-45min.en.tex
+
+\mode<presentation>
+{
+  \usetheme{Warsaw}
+  \setbeamercovered{transparent}
+}
+
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+\usepackage{minted}
+
+\newminted{prolog}{linenos=false}
+\newmintedfile{prolog}{linenos=true}
+
+\title[CS 571: Prolog]{Prolog}
+
+%\subtitle
+%{Presentation Subtitle} % (optional)
+
+%\author[Author, Another] % (optional, use only with lots of authors)
+%{F.~Author\inst{1} \and S.~Another\inst{2}}
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+%\institute[Universities of Somewhere and Elsewhere] % (optional, but mostly needed)
+%{
+%  \inst{1}%
+%  Department of Computer Science\\
+%  University of Somewhere
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+%\date[Short Occasion] % (optional)
+%{Date / Occasion}
+
+%\subject{Talks}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}<beamer>{Outline}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+
+\setbeamertemplate{headline}{}
+
+@begin{include_path}
+  programs
+@end{include_path}
+
+\begin{document}
+
+\begin{frame}[fragile]{Features}
+
+
+\begin{itemize}
+
+  \item  Programming using logic.
+
+  \item  Symbolic computation.
+
+  \item  Backtracking for control.
+
+  \item  Pattern-matching used for both data access and data construction.
+
+  \item  Logical variables.
+
+  \item  Arithmetic not logical.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Brief History}
+
+\begin{itemize}
+
+\item Originated from research in {\em automated theorem proving}.
+
+\item Idea of {\em logic programming} first conceived by a group around
+Alain Colmerauer in France.
+
+\item First efficient (``compiled'') implementation by David H. D. Warren in
+Scotland.
+
+\item Chosen by the Japanese as the primary language for their {\em 5th
+Generation Computer Project} in the 80s.  Did not really go anywhere, but
+did popularize Prolog.
+
+\item Has currently been generalized to {\em constraint programming languages}.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Prolog Data}
+
+
+Prolog data entities are referred to as {\em terms}.  {\em Terms} consists of:
+
+\begin{itemize}
+
+  \item Numbers; integers, floating-point numbers.
+
+  \item Atoms: identifier starting with lower-case letters; a sequence of
+    special characters; any string withing single quotes \verb@'@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Prolog Data Continued}
+
+
+\begin{itemize}
+  \item Variables: identifiers starting with upper-case letters or underscores.
+    A anonymous variable is denoted using simply a \verb@_@; each occurrence of
+    a anonymous variable can stand for different entities.
+
+  \item If \verb@f@ meets the syntactic restrictions for a atom, and $T_1$,
+    $T_2$, $\ldots$, $T_n$ are terms, then so is \verb@f(@$T_1$\verb@,@
+    $T_2$\verb@,@ $\ldots$ $T_n$\verb@)@.  This sort of term is referred to
+    as a {\em structure} with functor \verb@f@ and arity $N$.  The functor and
+    arity are often denoted together as \verb@f/@$N$.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Syntactic Sugar}
+
+
+\begin{itemize}
+
+  \item Prolog supports user-defined {\em distfix} operators; this covers
+    commonly used operators like arithmetic operators.  Terms using
+    operators are syntactic sugar for the corresponding structure; i.e.,
+    \verb@1 + 2@ is equivalent to \verb@+(1, 2)@.
+
+  \item The integer corresponding to the character code for character $c$
+    can be be denoted as \verb@0'@$c$.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Syntactic Sugar: Lists}
+
+
+\begin{itemize}
+
+  \item Pairs which are structures built using functor \verb@./2@ are denoted
+    within square-brackets with the \verb@|@ operator; i.e., \verb@.(a, b)@ is
+    denoted as \verb@[a|b]@.
+
+  \item Lists are defined in the usual way using pairs.   The empty list is
+    denoted as \verb@[]@.  A list of elements \verb@[a, b, c]@ is equivalent to
+    \verb@.(a, .(b, .(c, [])))@.  A list with head \verb@X@ and tail \verb@Xs@ is
+    denoted as \verb@[X|Xs]@.
+
+  \item A string within double quotes denotes the list of integers corresponding
+    to the character codes of the characters in the string.  For example,
+    \verb@"abc"@ is syntactic sugar for \verb@[97, 98, 99]@.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Pattern Matching}
+
+
+Almost all computation in Prolog is done using a general form of pattern
+matching termed {\em unification}.  
+
+\begin{itemize}
+
+\item Unifying two terms finds a {\em most
+general substitution} for the variables in the two terms such that applying
+the substitutions makes the two terms {\em identical}.  
+
+\item Unification is done
+implicitly but can be made explicit using the \verb@=@ operator.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Pattern Matching Examples}
+
+\begin{prologcode*}{}
+?- X = a.
+X = a ;
+No
+?- f(X, a) = f(a, Y).
+X = a
+Y = a ;
+No
+?- f(X, a) = f(a, X).
+X = a ;
+No
+?- f(X, a) = f(b, X).
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Pattern Matching Examples Continued}
+
+\begin{prologcode*}{}
+?- .(a, b) = [X|Y].
+X = a
+Y = b ;
+No
+?- [a, b, c] = [X|Y].
+X = a
+Y = [b, c] ;
+No
+?- [a, b, c] = [X, Y, Z].
+X = a
+Y = b
+Z = c ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Pattern Matching Examples Continued}
+
+\begin{prologcode*}{}
+?- [X, [a, b], X|Z] = [a, [X|Z], a, b].
+X = a
+Z = [b] ;
+No
+?-     
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Prolog Program}
+
+A Prolog program consists of a set of {\em facts} and {\em rules}.  
+
+\begin{itemize}
+
+\item A {\em
+fact} consisting of a single "predicate" is unconditionally true.  
+
+\item A {\em
+rule} $P$\verb@:-@$Q$ says that {\bf head} predicate $P$ is true if $Q$ is
+true, where the {\bf body} $Q$ can consists of multiple predicates separated
+by
+\verb@,@ denoting logical-and.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Ancestor Program}
+
+Example \href{./programs/ancestors.pl}{ancestors.pl}:
+
+@pre{prologfile}{ancestors.pl}
+\end{frame}
+
+\begin{frame}[fragile]{Ancestor Log}
+
+\begin{verbatim}
+?- ['ancestors.pl'].
+Yes
+?- mother(tom, jill).
+Yes
+?- mother(tom, mary).
+No
+?- mother(tom, X).
+X = jill ;
+No
+?- mother(X, jill).
+X = tom ;
+No
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Ancestor Log Continued}
+
+\begin{prologcode*}{}
+?- mother(X, mary).
+X = jill ;
+No
+?- parent(tom, X).
+X = jill ;
+X = bill ;
+No
+?- ancestor(bill, X).
+X = marge ;
+X = harry ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Ancestor Log Continued}
+
+\begin{prologcode*}{}
+?- ancestor(tom, X).
+X = jill ;
+X = bill ;
+X = mary ;
+X = frank ;
+X = marge ;
+X = harry ;
+No
+?- ancestor(X, harry).
+X = bill ;
+X = tom ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Ancestor Log Continued}
+
+\begin{prologcode*}{}
+?- ancestor(X, Y).
+X = tom
+Y = jill ;
+X = jill
+Y = mary ;
+X = bill
+Y = marge ;
+X = tom
+Y = bill ;
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Ancestor Log Continued}
+
+\begin{prologcode*}{}
+X = jill
+Y = frank ;
+X = bill
+Y = harry ;
+X = tom
+Y = mary ;
+X = tom
+Y = frank ;
+X = tom
+Y = marge ;
+X = tom
+Y = harry ;
+No
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Multi-Way Predicates}
+
+As the previous example illustrates, \verb@ancestor/2@ can be used with multiple
+instantiation patterns and is not only used to find ancestors, but can also
+be used to find descendents.  In simple cases like this, these sort of
+multi-way predicates are easy to write, but in large programs, predicates
+are often used only for fixed instantiation patterns.
+
+A useful multi-way predicate is \href{./programs/xappend.pl}{append} to
+append two lists together:
+
+\begin{prologcode*}{}
+xappend([], X, X).
+xappend([X|Xs], Ys, [X|Zs]):-
+  xappend(Xs, Ys, Zs).
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Append Log}
+
+\begin{prologcode*}{}
+?- ['xappend.pl'].
+% xappend.pl compiled 0.01 sec, 620 bytes
+Yes
+?- xappend([a, b], [1, 2, 3], Z).
+Z = [a, b, 1, 2, 3] ;
+No
+?- xappend([a, b], X, [a, b, 1, 2, 3]).
+X = [1, 2, 3] ;
+No
+?- xappend(X, [1, 2, 3], [a, b, 1, 2, 3]).
+X = [a, b] ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Append Log Continued}
+
+\begin{prologcode*}{}
+?- xappend(X, Y, [a, b, 1, 2, 3]).
+X = []
+Y = [a, b, 1, 2, 3] ;
+X = [a]
+Y = [b, 1, 2, 3] ;
+X = [a, b]
+Y = [1, 2, 3] ;
+X = [a, b, 1]
+Y = [2, 3] ;
+X = [a, b, 1, 2]
+Y = [3] ;
+X = [a, b, 1, 2, 3]
+Y = [] ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Append Log Continued}
+
+\begin{prologcode*}{}
+?- xappend(X, Y, Z).
+X = []
+Y = _G148
+Z = _G148 ;
+X = [_G235]
+Y = _G148
+Z = [_G235|_G148] ;
+X = [_G235, _G241]
+Y = _G148
+Z = [_G235, _G241|_G148] ;
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Append Log Continued}
+
+\begin{prologcode*}{}
+X = [_G235, _G241, _G247]
+Y = _G148
+Z = [_G235, _G241, _G247|_G148] ;
+X = [_G235, _G241, _G247, _G253]
+Y = _G148
+Z = [_G235, _G241, _G247, _G253|_G148] 
+Yes
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Naive Reverse}
+
+
+A naive $O(n^2)$ \href{./programs/nrev.pl}{reverse}:
+
+@pre{prologfile}{nrev.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{Naive Reverse Log}
+
+\begin{prologcode*}{}
+?- ['nrev.pl'].
+% nrev.pl compiled 0.00 sec, 672 bytes
+Yes
+?- nrev([a, b, c], Z).
+Z = [c, b, a] ;
+No
+?- nrev(X, [1, 2, 3]).
+X = [3, 2, 1] ;
+Action (h for help) ? a
+abort
+% Execution Aborted
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Naive Reverse Log}
+
+\begin{prologcode*}{}
+?- nrev(X, Y).
+X = []
+Y = [] ;
+X = [_G221]
+Y = [_G221] ;
+X = [_G221, _G224]
+Y = [_G224, _G221] ;
+X = [_G221, _G224, _G227]
+Y = [_G227, _G224, _G221] ;
+X = [_G221, _G224, _G227, _G230]
+Y = [_G230, _G227, _G224, _G221] 
+Yes
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Non-Termination and Operational Semantics}
+
+
+As the \verb@nrev/2@ log illustrates, termination is not guaranteed.
+
+Every Prolog program can be given 2 kinds of semantics:
+
+\begin{description}
+
+  \item[{\bf Declarative Semantics:}]
+    The program is a collection of logical statements (facts and rules)
+    about the world.
+
+  \item[{\bf Operational Semantics:}]
+    A Prolog interpreter operates on a Prolog program to infer one or more
+    \alert{goals} from the program.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Declarative Semantics}
+
+
+A Prolog program is a collection of declarative statements about the 
+domain of interest:
+
+\begin{itemize}
+
+  \item Each \alert{fact} is unconditionally true.
+
+  \item Each \alert{rule} is a logical \textbf{implication}; the
+    \textbf{conjunction} of \alert{body} predicates implies the
+    \alert{head} predicate.
+
+  \item The declarative meaning of the program is the \textbf{conjunction}
+    of the facts and rules in the program.
+
+  \item Ideally, each fact or rule should be a true statement about the
+    domain, independent of any other fact or rule in the program.
+
+  \item The ordering of the facts/rules in a program should not affect
+    the declarative meaning of the program.
+
+    \item The program logically implies the truth of further facts, some
+      subset of which can be computed using the operational semantics.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Operational Semantics}
+\begin{description}
+
+  \item[{\bf Operational Semantics:}]
+     The operation of a Prolog systems given a goal $G$ to satisfy 
+     is as follows:
+
+     \begin{enumerate}
+
+       \item The system finds the first rule or fact whose head matches $G$
+          and recursively attempts to solve all goals in the body with the
+          substitution matching the head to $G$ applied to the body.
+
+       \item If the attempt to solve the body succeeds, then the goal $G$
+          succeeds. 
+
+       \item If the body attempt fails then it repeats with the next rule or
+          fact matching $G$.  If all such attempts fail, then the goal
+	  $G$ fails.
+\end{enumerate}
+
+The operation constitutes a depth-first search to satisfy goal $G$.
+
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{nrev Loop}
+
+
+Why does \href{./programs/nrev.pl}{nrev} loop for \verb@nrev(X, [1])@?
+
+@pre{prologfile}{nrev.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{nrev Loop}
+
+\begin{prologcode*}{}
+?- nrev(X, [1]).
+X = [1] ;
+Action (h for help) ? a
+abort
+% Execution Aborted
+?- trace.
+Yes
+[trace]  ?- nrev(X, [1]).
+   Call: (8) nrev(_G279, [1]) ? 
+   Call: (9) nrev(_G333, _L207) ? 
+   Exit: (9) nrev([], []) ? 
+   Call: (9) lists:append([], [_G332], [1]) ? 
+   Exit: (9) lists:append([], [1], [1]) ? 
+   Exit: (8) nrev([1], [1]) ? 
+X = [1] ;
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{nrev Trace Continued}
+
+\begin{prologcode*}{}
+   Redo: (9) nrev(_G333, _L207) ? 
+   Call: (10) nrev(_G336, _L227) ? 
+   Exit: (10) nrev([], []) ? 
+   Call: (10) lists:append([], [_G335], _L207) ? 
+   Exit: (10) lists:append([], [_G335], [_G335]) ? 
+   Exit: (9) nrev([_G335], [_G335]) ? 
+   Call: (9) lists:append([_G335], [_G332], [1]) ? 
+   Call: (10) lists:append([], [_G332], []) ? 
+   Fail: (10) lists:append([], [_G332], []) ? 
+   Fail: (9) lists:append([_G335], [_G332], [1]) ? 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{nrev Trace Continued}
+
+\begin{prologcode*}{}
+   Redo: (10) nrev(_G336, _L227) ? 
+   Call: (11) nrev(_G339, _L240) ? 
+   Exit: (11) nrev([], []) ? 
+   Call: (11) lists:append([], [_G338], _L227) ? 
+   Exit: (11) lists:append([], [_G338], [_G338]) ? 
+   Exit: (10) nrev([_G338], [_G338]) ? 
+   Call: (10) lists:append([_G338], [_G335], _L207) ? 
+   Call: (11) lists:append([], [_G335], _G348) ? 
+   Exit: (11) lists:append([], [_G335], [_G335]) ? 
+   Exit: (10) lists:append([_G338], [_G335], [_G338, _G335]) ? a
+% Execution Aborted
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Accumulating Reverse}
+
+Reverse which uses accumulating parameters to get a $O(n)$
+\href{./programs/rev.pl}{reverse}:
+
+@pre{prologfile}{rev.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{Accumulating Reverse Log}
+
+\begin{prologcode*}{}
+?- ['rev.pl'].
+% rev.pl compiled 0.00 sec, 756 bytes
+Yes
+?- rev([1, 2, 3], X).
+X = [3, 2, 1] ;
+No
+?- rev(X, [a, b, Z]).
+X = [_G156, b, a]
+Z = _G156 ;
+ERROR: Out of global stack
+?- rev([a, b, X], Z).
+X = _G153
+Z = [_G153, b, a] ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Accumulating Reverse Log Continued}
+
+\begin{prologcode*}{}
+?- rev(X, Y).
+X = []
+Y = [] ;
+X = [_G212]
+Y = [_G212] ;
+X = [_G212, _G218]
+Y = [_G218, _G212] ;
+X = [_G212, _G218, _G224]
+Y = [_G224, _G218, _G212] ;
+X = [_G212, _G218, _G224, _G230]
+Y = [_G230, _G224, _G218, _G212] 
+Yes
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Member}
+
+Predicate \href{./programs/xmember.pl}{xmember} to check whether specified
+element unifies with some member of a list.
+
+@pre{prologfile}{xmember.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Member Log}
+
+\begin{prologcode*}{}
+?- ['xmember.pl'].
+% xmember.pl compiled 0.00 sec, 584 bytes
+Yes
+?- xmember(2, [1, 2, 3]).
+Yes
+?- xmember(4, [1, 2, 3]).
+No
+?- xmember(X, [1, 2, 3]).
+X = 1 ;
+X = 2 ;
+X = 3 ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Member Log Continued}
+
+\begin{prologcode*}{}
+?- xmember(f(X, a), [f(1, Y), g(2), f(3, Z)]).
+X = 1
+Y = a
+Z = _G162 ;
+X = 3
+Y = _G151
+Z = a ;
+No
+?- xmember(a, Z).
+Z = [a|_G198] ;
+Z = [_G197, a|_G201] ;
+Z = [_G197, _G200, a|_G204] ;
+Z = [_G197, _G200, _G203, a|_G207] 
+Yes
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Member Log Continued}
+
+\begin{prologcode*}{}
+?- xmember(X, Y).
+X = _G147
+Y = [_G147|_G213] ;
+X = _G147
+Y = [_G212, _G147|_G216] ;
+X = _G147
+Y = [_G212, _G215, _G147|_G219] 
+Yes
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Permutations}
+
+
+\href{./programs/perms.pl}{Permutations}:
+
+@pre{prologfile}{perms.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{Permutations Log}
+
+\begin{prologcode*}{}
+?- perms([1, 2, 3], Z).
+Z = [1, 2, 3] ;
+Z = [2, 1, 3] ;
+Z = [2, 3, 1] ;
+Z = [1, 3, 2] ;
+Z = [3, 1, 2] ;
+Z = [3, 2, 1] ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Permutations Log Continued}
+
+\begin{prologcode*}{}
+?- perms(X, [1, 2]).
+
+X = [1, 2] ;
+
+X = [2, 1] ;
+
+Action (h for help) ? a
+abort
+% Execution Aborted
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Quick Sort}
+
+\href{./programs/qsort.pl}{Quick sort program}:
+
+@pre{prologfile}{qsort.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{Quick Sort Log}
+
+\begin{prologcode*}{}
+?- qsort([c, b, 1, 2, 'X'], Z).
+Z = [1, 2, 'X', b, c] ;
+No
+?- qsort([f(x), 2, Y, 1, f(g)], Z).
+Y = _G155
+Z = [_G155, 1, 2, f(g), f(x)] ;
+No
+?- qsort(X, [1, 2, 3]).
+X = [1, 2, 3] ;
+Action (h for help) ? a
+abort
+% Execution Aborted
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Arithmetic}
+
+\begin{itemize}
+
+  \item \verb@is/2@ allows evaluating arithmetic expressions.  $N$ \verb@is@ $E$
+    evaluates arithmetic expression $E$ and unifies result with $N$
+    (which is usually a unbound variable at the time of call).  Note
+    that $E$ cannot contain any variables unbound at the time of call.
+
+  \item More logical predicates: \verb@plus(@$X$\verb@,@ $Y$\verb@,@ $Z$\verb@)@ can be used with
+    any 2 arguments instantiated.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Arithmetic Log}
+
+\begin{prologcode*}{}
+?- N is 1 + 2.
+N = 3 ;
+No
+?- N is 2*3 + 5 mod 2.
+N = 7 ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Arithmetic Log Continued}
+
+\begin{prologcode*}{}
+?- plus(1, 2, Z).
+Z = 3 ;
+No
+?- plus(X, 5, 9).
+X = 4 ;
+No
+?- succ(X, 5).
+X = 4 ;
+No
+?- succ(4, Z).
+Z = 5 ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Arithmetic Log Continued}
+
+\begin{prologcode*}{}
+?- 3 is 1 + M.
+ERROR: Arguments are not sufficiently instantiated
+?- succ(Z, -1).
+ERROR: succ/2: Domain error: \verb@not_less_than_zero' 
+       expected, found @-1'
+?- plus(X, Y, 4).
+ERROR: succ/2: Arguments are not sufficiently 
+       instantiated
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Length}
+
+
+\href{./programs/xlength.pl}{xlength.pl}:
+
+@pre{prologfile}{xlength.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Length Log}
+
+\begin{prologcode*}{}
+?- xlength([], Z).
+Z = 0 ;
+No
+?- xlength([a, b], Z).
+Z = 2 ;
+No
+?- xlength([a, b], 1).
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{List Length Log Continued}
+
+\begin{prologcode*}{}
+?- xlength(Z, 2).
+Z = [_G203, _G206] ;
+Action (h for help) ? a
+abort
+% Execution Aborted
+?- xlength([_, _, _|_], 2).
+Action (h for help) ? a
+abort
+% Execution Aborted
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Peano Arithmetic}
+
+
+\href{./programs/peano.pl}{peano.pl}:
+
+@pre{prologfile}{peano.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{Peano Arithmetic Log}
+
+\begin{prologcode*}{}
+?- add(s(0), s(s(0)), Z).
+Z = s(s(s(0))) ;
+No
+?- add(X, Y, s(s(s(s(0))))).
+X = 0
+Y = s(s(s(s(0)))) ;
+X = s(0)
+Y = s(s(s(0))) ;
+X = s(s(0))
+Y = s(s(0)) ;
+X = s(s(s(0)))
+Y = s(0) ;
+X = s(s(s(s(0))))
+Y = 0 ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Peano Arithmetic Log}
+
+\begin{prologcode*}{}
+?- mult(s(s(0)), s(s(s(0))), Z).
+Z = s(s(s(s(s(s(0)))))) ;
+No
+?- mult(X, Y, s(s(s(s(s(s(0))))))).
+X = s(0)
+Y = s(s(s(s(s(s(0)))))) ;
+ERROR: Out of global stack
+   Exception: (8) mult(_G69, _G27, _L169) ? a
+% Execution Aborted
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Negation-By-Failure}
+
+
+\begin{itemize}
+
+  \item Negation of a goal is denoted using \verb@\+@.  Not a logical not.
+
+  \item \verb@\+@ $G$ succeeds iff $G$ fails; referred to as {\em
+  negation-by-failure}.
+
+  \item When \verb@\+@ $G$ succeeds, no variables in $G$ will be bound.
+
+  \item To avoid surprising results, \verb@\+@ $G$ should be used only 
+    when $G$ is "ground" (does not contain any variables).
+
+  \item Can have logical behaviour under the {\em closed-world assumption}:
+    i.e., all relevant aspects of the world are represented.
+
+  \item When the system fails to prove something, we assume that the something
+    is false; valid only under the closed world assumption.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Negation Example}
+
+
+\href{./programs/negation.pl}{negation.pl}:
+
+\begin{prologcode*}{}
+mother(joe, jane).
+father(joe, frank).
+
+
+non_parent(X, Y):-
+  \+ mother(X, Y),
+  \+ father(X, Y).
+
+student(joe).
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Negation Log}
+
+\begin{prologcode*}{}
+?- non_parent(joe, harry).
+Yes
+?- non_parent(joe, frank).
+No
+?- non_parent(jill, joe).
+Yes
+?- non_parent(X, Y).
+No
+?- student(Y), non_parent(X, Y).
+Y = joe
+X = _G149 ;
+No
+?- non_parent(X, Y), student(Y).
+No
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{N Queens}
+
+Place $N$ queens on a $N\times N$ chess-board such that no queen attacks
+the other.
+
+\begin{itemize}
+
+\item Queens in the same row attack each other; hence assume each
+  queen in a separate row.  Specifically, assume solution as a $N$-element
+  vector \verb@Zs@ where \verb@Zs[i]@ gives column number of queen in
+  row \verb@i@.
+
+\item Queens in the same column attack each other: ensure solution vector
+contains distinct column number.
+
+\item Iterate solution vector to ensure queens do not attack each other
+via main or auxiliary diagonals.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{N Queens Program}
+
+In \href{./programs/n-queens.pl}{n-queens.pl}:
+
+@pre{prologfile}[begintag=@1@,endtag=@2@]{n-queens.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{N Queens Program Continued}
+
+@pre{prologfile}[begintag=@2@,endtag=@3@]{n-queens.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{N Queens Program Continued}
+
+@pre{prologfile}[begintag=@4@]{n-queens.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{N Queens Log}
+
+\begin{prologcode*}{}
+?- n_queens(0, Zs).
+Zs = [] ;
+false.
+?- n_queens(1, Zs).
+Zs = [0] ;
+false.
+?- n_queens(2, Zs).
+false.
+?- n_queens(3, Zs).
+false.
+?- n_queens(4, Zs).
+Zs = [1, 3, 0, 2] ;
+Zs = [2, 0, 3, 1] ;
+false.
+?-
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{River Crossing Puzzle}
+
+A farmer who is taking a cabbage, goat and wolf to the market needs to
+cross a river in a boat which can hold only one item in addition to
+the farmer.  If left unattended, the goat will eat the cabbage and the
+wolf will eat the goat.  How can the farmer get all items across the
+river?
+
+\begin{itemize}
+
+\item Farmer may need to cross river alone or take item back-and-forth
+across the river.  How to avoid an infinite loop?
+
+\item Key is to limit the number of trips across the river and increase
+number of trips across river to find (more) solutions.
+
+\item Basically uses \alert{iterative depth-first-search}.
+
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{River Crossing Program}
+
+In \href{./programs/river-crossing.pl}{river-crossing.pl}:
+
+@pre{prologfile}[begintag=@1@,endtag=@2@]{river-crossing.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{River Crossing Program Continued}
+
+@pre{prologfile}[begintag=@2@,endtag=@3@]{river-crossing.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{River Crossing Program Continued}
+
+@pre{prologfile}[begintag=@3@,endtag=@4@]{river-crossing.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{River Crossing Program Continued}
+
+@pre{prologfile}[begintag=@4@,endtag=@5@]{river-crossing.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{River Crossing Program Continued}
+
+@pre{prologfile}[begintag=@5@,endtag=@6@]{river-crossing.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{River Crossing Program Continued}
+
+@pre{prologfile}[begintag=@6@]{river-crossing.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{River Crossing Log}
+
+\begin{prologcode*}{}
+?- river_cross.
+state([f,c,g,w],[])  --forward(f,g) --> state([c,w],[f,g])
+state([c,w],[f,g])   --backward(f)  --> state([f,c,w],[g])
+state([f,c,w],[g])   --forward(f,c) --> state([w],[f,c,g])
+state([w],[f,c,g])   --backward(f,g)--> state([f,g,w],[c])
+state([f,g,w],[c])   --forward(f,w) --> state([g],[f,w,c])
+state([g],[f,w,c])   --backward(f)  --> state([f,g],[w,c])
+state([f,g],[w,c])   --forward(f,g) --> state([],[f,g,w,c])
+true ;
+state([f,c,g,w],[])  --forward(f,g) --> state([c,w],[f,g])
+state([c,w],[f,g])   --backward(f)  --> state([f,c,w],[g])
+state([f,c,w],[g])   --forward(f,w) --> state([c],[f,w,g])
+state([c],[f,w,g])   --backward(f,g)--> state([f,g,c],[w])
+state([f,g,c],[w])   --forward(f,c) --> state([g],[f,c,w])
+state([g],[f,c,w])   --backward(f)  --> state([f,g],[c,w])
+state([f,g],[c,w])   --forward(f,g) --> state([],[f,g,c,w])
+true 
+?-
+\end{prologcode*}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{The Cut}
+
+
+\begin{itemize}
+
+  \item A \verb@cut@ denoted using \verb@!@ is logically equivalent to \verb@true@.
+
+  \item A cut is used for *control*, to prevent backtracking.  
+    Specifically, once a cut is executed, control cannot
+    backtrack over it.
+
+  \item Once a cut is executed within a Prolog rule, it denotes commitment
+    to choosing that rule as well as all decisions made in the body
+    of the rule before the cut.
+
+  \item Should avoid using \verb@!@ for {\em logical} programs, but necessary
+    sometimes for efficiency or to trim unneeded solutions.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Cut Example}
+
+\href{./programs/cut.pl}{Cut Example}
+
+\begin{prologcode*}{}
+f(a). f(b). f(c).
+g(1). g(2). g(3).
+h(x). h(y). h(z).
+
+p1(X):- f(X).
+p1(X):- g(X).
+p1(X):- h(X).
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Cut Example Continued}
+
+\begin{prologcode*}{}
+p2(X):- f(X).
+p2(X):- g(X), !.
+p2(X):- h(X).
+
+p3(X):- f(X).
+p3(X):- !, g(X).
+p3(X):- h(X).
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Cut Log}
+
+\begin{prologcode*}{}
+?- p1(X).
+X = a ;
+X = b ;
+X = c ;
+X = 1 ;
+X = 2 ;
+X = 3 ;
+X = x ;
+X = y ;
+X = z ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Cut Log Continued}
+
+\begin{prologcode*}{}
+?- p2(X).
+X = a ;
+X = b ;
+X = c ;
+X = 1 ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Cut Log Continued}
+
+\begin{prologcode*}{}
+?- p3(X).
+X = a ;
+X = b ;
+X = c ;
+X = 1 ;
+X = 2 ;
+X = 3 ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Cut Log Continued}
+
+\begin{prologcode*}{}
+?- p1(x).
+Yes
+?- p2(x).
+Yes
+?- p3(x).
+No
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Length Revisited}
+
+Previous \verb@xlength/2@ went into infinite loop because it kept generating
+longer lists.  Fix with \verb@zlength/2@ below.
+
+\href{./programs/zlength.pl}{zlength.pl}:
+
+@pre{prologfile}{zlength.pl}
+
+\end{frame}
+
+\begin{frame}[fragile]{Length Revisited Log}
+
+\begin{prologcode*}{}
+?- zlength([1, 2], Z).
+Z = 2 ;
+No
+?- xlength(X, 2).
+X = [_G203, _G206] ;
+Action (h for help) ? a
+abort
+% Execution Aborted
+?- zlength(X, 2).
+X = [_G206, _G209] ;
+No
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+%% \begin{frame}[fragile]{Difference Lists}
+
+%% \begin{itemize}
+
+%%   \item If we have a list \verb@[a, b, c|X]@ to which we want to append the
+%%     list \verb@[1, 2, 3]@, we can do so by merely unifying \verb@X@ with
+%%     \verb@[1, 2, 3]@.  Specifically:
+
+%% \begin{prologcode*}{}
+%%     ?- A = [a, b, c|X], B = [1, 2, 3], X = B.
+
+%%     A = [a, b, c, 1, 2, 3]
+%%     X = [1, 2, 3]
+%%     B = [1, 2, 3] ;
+
+%%     No
+%%     ?- 
+%% \end{prologcode*}
+
+%% \end{itemize}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Difference Lists}
+
+%% \begin{itemize}
+
+%%   \item Maintain difference lists \verb@[a, b, c|X]-X@, \verb@[1, 2, 3|Y]-Y@.  
+
+%%   \item  Define \verb@diff_list_append(X-Y, Y-Z, X-Z).@
+
+%%   \item \verb@diff_list_append/2@ is often inline expanded within the code.
+
+%% \end{itemize}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Difference List Naive Reverse}
+
+%% By using difference lists we can convert the $O(n^2)$ naive reverse into a
+%% $O(n)$ reverse by avoiding the call to \verb@append/3@.
+
+%% \href{./programs/diff_nrev.pl}{diff\_nrev.pl}:
+
+%% \begin{prologcode*}{}
+%% diff_nrev(X, Xrev):-
+%%   diff_nrev_lo(X, Xrev-[]).
+
+%% diff_nrev_lo([], X-X).
+%% diff_nrev_lo([X|Xs], Y-Z):-
+%%   diff_nrev_lo(Xs, Y-[X|Z]).
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Difference List Naive Reverse Log}
+%% \begin{prologcode*}{}
+%% ?- diff_nrev([], Z).
+%% Z = [] ;
+%% No
+%% ?- diff_nrev([1, 2, 3], Z).
+%% Z = [3, 2, 1] ;
+%% No
+%% ?- diff_nrev(X, [1, 2, 3]).
+%% X = [3, 2, 1] ;
+%% Action (h for help) ? a
+%% abort
+%% % Execution Aborted
+%% ?- 
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Grammar Rules}
+
+%% \begin{itemize}
+
+%%   \item Grammar rules are a interface to difference lists.  
+
+%%   \item Grammar rules are denoted using\verb@-->/2@.
+
+%%   \item Terminals are enclosed within square brackets, regular
+%%   Prolog code within braces.
+
+%%   \item Rules are translated into regular Prolog clauses with
+%%   difference lists.  
+
+%% \end{itemize}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Octal Numbers Grammar}
+
+%% A octal number, which is a sequence of octets can be
+%% defined using the following {\em definite-clause grammar}:
+%% \href{./programs/dcg.pl}{dcg.pl}.  (Recall that a string is a list of character
+%% codes and the character code for character $c$ is denoted using
+%% \verb@0'@$c$).
+
+%% \begin{prologcode*}{}
+%% octal --> octet.
+%% octal --> octet, octal.
+
+%% octet --> [0'0].
+%% ...
+%% octet --> [0'7].
+%% \end{prologcode*}
+
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Octal Grammar Log}
+
+%% \begin{prologcode*}{}
+%% ?- listing(octal).
+%% octal(A, B) :-
+%% 	octet(A, B).
+%% octal(A, B) :-
+%% 	octet(A, C),
+%% 	octal(C, B).
+
+%% Yes
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Octal Grammar Log Continued}
+
+%% \begin{prologcode*}{}
+%% ?- listing(octet).
+%% octet([48|A], A).
+%% ...
+%% octet([55|A], A).
+%% Yes
+%% ?- octal("777", []).
+%% Yes
+%% ?- octal("7778", X).
+%% X = [55, 55, 56] ;
+%% X = [55, 56] ;
+%% X = [56] ;
+%% No
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Parsing Arithmetic Expressions}
+
+%% Since Prolog uses a depth-first search, it works like a recursive-descent
+%% parser.  Hence we can use the following DCG for arithmetic expressions:
+
+%% \href{./programs/arith.pl}{arith.pl}:
+
+%% \begin{prologcode*}{}
+%% exp -->
+%%   term, exp_rest.
+
+%% exp_rest -->
+%%   [0'+], term, exp_rest.
+%% exp_rest -->
+%%   [0'-], term, exp_rest.
+%% exp_rest -->
+%%   [].
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Parsing Arithmetic Expressions Continued}
+
+%% \begin{prologcode*}{}
+%% term -->
+%%   factor, term_rest.
+
+%% term_rest -->
+%%   [0'*], factor, term_rest.
+%% term_rest -->
+%%   [0'/], factor, term_rest.
+%% term_rest -->
+%%   [].
+
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Parsing Arithmetic Expressions Continued}
+
+%% \begin{prologcode*}{}
+%% factor -->
+%%   [X], { 0'0 =< X, X =< 0'9 }.
+%% factor -->
+%%   [0'(], exp, [0')].
+%% factor -->
+%%   [0'-], factor.
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Parsing	Arithmetic Expressions Log}
+
+%% \begin{prologcode*}{}
+%% ?- exp("1+2*3", []).
+%% Yes
+%% ?- exp("1+2*3/", []).
+%% No
+%% ?- exp("(1+2)*3", []).
+%% Yes
+%% ?- exp("(1+2)*3)", []).
+%% No
+%% ?- exp("--1-2*(3)", []).
+%% Yes
+%% ?- exp("-+1-2*(3)", []).
+%% No
+%% ?- 
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Constructing an Abstract Syntax Tree}
+
+
+%% \href{./programs/ast.pl}{ast.pl}:
+
+%% \begin{prologcode*}{}
+%% exp(E) -->
+%%   term(T), exp_rest(T, E).
+%% exp_rest(T, E) -->
+%%   [0'+], term(T1), exp_rest(add(T, T1), E).
+%% exp_rest(T, E) -->
+%%   [0'-], term(T1), exp_rest(sub(T, T1), E).
+%% exp_rest(T, T) -->
+%%   [].
+
+%% term(T) -->
+%%   factor(F), term_rest(F, T).
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Constructing an Abstract Syntax Tree Continued}
+
+%% \begin{prologcode*}{}
+
+%% term_rest(F, T) -->
+%%   [0'*], factor(F1), term_rest(mul(F, F1), T).
+%% term_rest(F, T) -->
+%%   [0'/], factor(F1), term_rest(div(F, F1), T).
+%% term_rest(F, F) -->
+%%   [].
+%% factor(F) -->
+%%   [X], { 0'0 =< X, X =< 0'9, F is X - 0'0 }.
+%% factor(F) -->
+%%   [0'(], exp(F), [0')].
+%% factor(neg(F)) -->
+%%   [0'-], factor(F).
+%% \end{prologcode*}
+
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Constructing an Abstract Syntax Tree Log}
+
+
+%% \begin{prologcode*}{}
+%% ?- exp(X, "(1+2)/3", []).
+%% X = div(add(1, 2), 3) ;
+%% No
+%% ?- exp(X, "-1+2/(3-4*5)", []).
+%% X = add(neg(1), div(2, sub(3, mul(4, 5)))) ;
+%% No
+%% ?- exp(X, "-1+2/(3-4*5-)", []).
+%% No
+%% ?- 
+%% \end{prologcode*}
+
+%% \end{frame}
+
+\begin{frame}[fragile]{Taming Cut}
+
+
+\begin{itemize}
+
+  \item A {\em green cut} is purely a efficiency enhancing device to increase
+    the efficiency of the program.  Example: the use of cut in \verb@zlength/2@, 
+    prevented an infinite loop, without loosing any solutions.
+
+  \item A {\em red cut} changes the semantics of the program.  Example: the program
+    with \verb@p1/1@, \verb@p2/1@, \verb@p3/1@ which gave different answers depending on
+    the placement of the cut.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Cut Examples}
+
+\begin{prologcode*}{}
+drive(X, Z):- red(X), !, ...
+drive(X, Z):- green(X), ...
+\end{prologcode*}
+
+Assuming that \verb@red(X)@ and \verb@green(X)@ are mutually exclusive, then above cut
+is a green cut.  However, using the fact that if \verb@red(X)@ is true, then
+\verb@green(X)@ must be false, the programmer then transforms the program:
+    
+\begin{prologcode*}{}
+drive(X, Z):- red(X), !, ...
+drive(X, Z):-  ...  %omit green(X) test.
+\end{prologcode*}
+
+the cut becomes red.  
+
+\end{frame}
+
+\begin{frame}[fragile]{Or}
+
+\verb@A ; B@ means try to solve \verb@A@.  If that fails try to solve \verb@B@.
+
+\begin{prologcode*}{}
+(A ; B):- A.
+(A ; B):- B.
+\end{prologcode*}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{If-Then-Else}
+
+
+\begin{itemize}
+
+  \item Disciplined use of a cut.
+
+  
+  \item \verb@A -> B ; C@ means if \verb@A@ then \verb@B@ else \verb@C@.
+
+
+  \item Equivalent to:
+
+\begin{prologcode*}{}
+     (A -> B ; C):- A, !, B.
+     (A -> B ; C):- C.
+\end{prologcode*}
+
+  \item \verb@A -> B@ equivalent to if \verb@A@ then \verb@B@ else \verb@fail@.
+
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{If-Then-Else Example}
+
+
+\begin{prologcode*}{}
+merge([], X, X):- !.
+merge(X, [], X):- !.
+merge([X|Xs], [Y|Ys], Zs):-
+  X @< Y ->
+    Zs = [X|Z1], merge(Xs, [Y|Ys], Zs1)
+  ; Zs = [Y|Z1], merge([X|Xs], Ys, Zs1).
+\end{prologcode*}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Merge Sort}
+
+
+\href{./programs/xmsort.pl}{xmsort.pl}:
+
+\begin{prologcode*}{}
+xmsort([], []):- !.
+xmsort([A], [A]):- !.
+xmsort([A|As], Sorted):-
+  xsplit([A|As], Odds, Evens),
+  xmsort(Odds, SortedOdds),
+  xmsort(Evens, SortedEvens),
+  xmerge(SortedOdds, SortedEvens, Sorted).
+
+xsplit([], [], []).
+xsplit([A|As], [A|Odds], Evens):-
+  xsplit(As, Evens, Odds).
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Merge Sort Continued}
+
+\begin{prologcode*}{}
+xmerge([], Xs, Xs):- !.
+xmerge(Xs, [], Xs):- !.
+xmerge([X|Xs], [Y|Ys], Zs):-
+  X @< Y ->
+    Zs = [X|Zs1], xmerge(Xs, [Y|Ys], Zs1)
+  ; Zs = [Y|Zs1], xmerge([X|Xs], Ys, Zs1).
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Merge Sort Log}
+
+\begin{prologcode*}{}
+?- xsplit([1, 2, 3, 4], X, Y).
+X = [1, 3]
+Y = [2, 4] ;
+No
+?- xsplit([1, 2, 3, 4, 5], X, Y).
+X = [1, 3, 5]
+Y = [2, 4] ;
+No
+?- xmerge([], [2], Z).
+Z = [2] ;
+No
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Merge Sort Log Continued}
+
+\begin{prologcode*}{}
+?- xmerge([1, 3, 5], [2, 4], Z).
+Z = [1, 2, 3, 4, 5] ;
+No
+?- xmsort([7, 4, 4, 2, 5, 2, 3], Z).
+Z = [2, 2, 3, 4, 4, 5, 7] ;
+No
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+%% \begin{frame}[fragile]{Type-Testing Predicates}
+
+
+%% \begin{itemize}
+
+%%   \item \verb@atom/1@ succeeds if its argument ia an atom.
+
+%%   \item \verb@atomic/1@ succeeds if its argument ia an atom or a  number.
+
+%%   \item \verb@integer/1@ succeeds if its argument is an integer.
+
+%%   \item \verb@number/1@ succeeds if its argument is an integer or floating point
+%%      number.
+
+%%   \item \verb@var/1@ succeeds if its argument is an unbound variable.
+
+%% \end{itemize}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Type-Testing Predicates Log}
+
+%% \begin{prologcode*}{}
+%% ?- atom(a).
+%% Yes
+%% ?- atom(f(a)).
+%% No
+%% ?- atom(1).
+%% No
+%% ?- atomic(1).
+%% Yes
+%% ?- atomic(1.0).
+%% Yes
+%% ?- integer(a).
+%% No
+%% ?- integer(1.0).
+%% No
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Type-Testing Predicates Log Continued}
+
+%% \begin{prologcode*}{}
+%% ?- integer(1).
+%% Yes
+%% ?- atomic(X).
+%% No
+%% ?- X = 1, number(X).
+%% X = 1 ;
+%% No
+%% ?- var(X), X = 1, number(X).
+%% X = 1 ;
+%% No
+%% ?- X = 1, var(X), number(X).
+%% No
+%% ?- 
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Count Variables}
+
+%% \href{./programs/countvars.pl}{countvars.pl}:
+
+%% \begin{prologcode*}{}
+%% count_vars(X, NVars):-
+%%   count_vars(X, 0, NVars).
+
+%% count_vars(X, N, N1):-
+%%   var(X), !, N1 is N + 1.
+%% count_vars([], N, N):- !.
+%% count_vars([X|Xs], N, Z):-
+%%   !,
+%%   count_vars(X, N, N1),
+%%   count_vars(Xs, N1, Z).
+%% count_vars(X, N, Z):-
+%%   X =.. [_|Args],
+%%   count_vars(Args, N, Z).
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Count Variables Log}
+
+%% \begin{prologcode*}{}
+%% ?- count_vars(X, Z).
+%% X = _G150
+%% Z = 1 ;
+%% No
+%% ?- count_vars(f(a, X, [X]), Z).
+%% X = _G150
+%% Z = 2 ;
+%% No
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Count Distinct Variables}
+
+
+%% \href{./programs/countvars.pl}{countvars.pl}:
+
+%% \begin{prologcode*}{}
+%% count_distinct_vars(X, NVars):-
+%%   count_distinct_vars(X, [], DistinctVars),
+%%   length(DistinctVars, NVars).
+
+%% count_distinct_vars(X, Vs, Zs):-
+%%   var(X), !, 
+%%   (memberq(X, Vs) -> Zs = Vs ; Zs = [X|Vs]).
+%% count_distinct_vars([], Vs, Vs):- !.
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Count Distinct Variables Continued}
+
+%% \begin{prologcode*}{}
+%% count_distinct_vars([X|Xs], Vs, Zs):-
+%%   !,
+%%   count_distinct_vars(X, Vs, Vs1),
+%%   count_distinct_vars(Xs, Vs1, Zs).
+%% count_distinct_vars(X, Vs, Zs):-
+%%   X =.. [_|Args],
+%%   count_distinct_vars(Args, Vs, Zs).
+
+%% memberq(X, [A|_]):-
+%%   X == A.
+%% memberq(X, [_|Z]):-
+%%   memberq(X, Z).
+%% \end{prologcode*}
+
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Count Distinct Variables Log}
+
+%% \begin{prologcode*}{}
+%% ?- count_distinct_vars(f(X, X), Z).
+%% X = _G147
+%% Z = 1 ;
+%% No
+%% ?- count_distinct_vars(f(X, Y, [A, A]), Z).
+%% X = _G153
+%% Y = _G154
+%% A = _G147
+%% Z = 3 ;
+%% No
+%% ?- 
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Count Distinct Vars Revisited}
+
+
+%% \href{./programs/negcountvars.pl}{negcountvars.pl}:
+
+%% \begin{prologcode*}{}
+%% count_vars(X):-
+%%   \+ \+ write_count_vars(X).
+
+%% write_count_vars(X):-
+%%   count_vars(X, 0, NVars), 
+%%   write(NVars), nl.
+
+%% count_vars(X, N, N1):-
+%%   var(X), !, X = N, N1 is N + 1.
+%% count_vars([], N, N):- !.
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Count Distinct Vars Revisited Continued}
+
+%% \begin{prologcode*}{}
+%% count_vars([X|Xs], N, Z):-
+%%   !,
+%%   count_vars(X, N, N1),
+%%   count_vars(Xs, N1, Z).
+%% count_vars(X, N, Z):-
+%%   X =.. [_|Args],
+%%   count_vars(Args, N, Z).
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Count Distinct Vars Revisited Log}
+
+%% \begin{prologcode*}{}
+%% ?- count_vars(X).
+%% 1
+%% X = _G147 ;
+%% No
+%% ?- count_vars(f(X, X, [A])).
+%% 2
+%% X = _G150
+%% A = _G147 ;
+%% No
+%% ?- ?- count_vars(f(X, X, [X])).
+%% 1
+%% X = _G147 ;
+%% No
+%% ?-
+%% \end{prologcode*}
+
+%% \end{frame}
+
+\begin{frame}[fragile]{Meta Predicates}
+
+Various predicates which allow manipulating program facts, rules and 
+relations.
+
+\begin{itemize}
+
+  %% \item \verb@assert(@{\it Term}\verb@)@: {\it Term} is added to the program.
+
+  %% \item \verb@retract(@{\it Term}\verb@)@: First rule or fact matching {\it
+  %%   Term} is removed from the program.
+
+  \item \verb@clause(@{\it Head}\verb@,@ {\it Body}\verb@)@: Finds first
+     rule or fact in database matching {\it Head} and {\it Body}.  For
+     facts, {\it Body} matches \verb@true@.
+
+  \item \verb@call(@$G$\verb@)@ calls goal $G$ which allows building a goal
+  dynamically.
+
+  %% \item $S$ \verb@=..@ $L$ is used to take apart or build up a structure.
+  %%   $S$ represents a structure, $L$ a list giving the functor and arguments.
+
+  %% \item \verb@arg(@$N$\verb@,@ $T$\verb@,@ $A$\verb@)@ succeeds if $A$ is
+  %%    the $N$'th argument of structure $T$.  The first argument is at index
+  %%    1.
+
+\end{itemize}
+
+\end{frame}
+
+
+%% \begin{frame}[fragile]{Assert/Retract Log}
+
+%% \begin{prologcode*}{}
+%% ?- p(X).
+%% ERROR: Undefined procedure: p/1
+%% ?- assert(p(a)).
+%% Yes
+%% ?- asserta(p(b)).
+%% Yes
+%% ?- assertz(p(c)).
+%% Yes
+%% ?- p(X).
+%% X = b ;
+%% X = a ;
+%% X = c ;
+%% No
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Assert/Retract Log Continued}
+
+%% \begin{prologcode*}{}
+%% ?- retract(p(X)).
+%% X = b 
+%% Yes
+%% ?- p(X).
+%% X = a ;
+%% X = c ;
+%% No
+%% ?- retract(p(c)).
+%% Yes
+%% ?- p(X).
+%% X = a ;
+%% No
+%% ?- 
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Structure Access Log}
+
+%% \begin{prologcode*}{}
+%% ?- f(a, b, c) =.. L.
+%% L = [f, a, b, c] ;
+%% No
+%% ?- f(X, Y) =.. [f|A].
+%% X = _G147
+%% Y = _G148
+%% A = [_G147, _G148] ;
+%% No
+%% ?- f(X, Y) =.. [f, A].
+%% No
+%% ?- F =.. [f, a, b].
+%% F = f(a, b) ;
+%% No
+%% ?- F =.. [f|A].
+%% ERROR: Arguments are not sufficiently instantiated
+%% \end{prologcode*}
+
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Structure Access Log Continued}
+
+%% \begin{prologcode*}{}
+%% ?- arg(2, f(a, b), Z).
+%% Z = b ;
+%% No
+%% ?- arg(3, f(a, b), Z).
+%% No
+%% ?- arg(N, f(a, b), Z).
+%% N = 1
+%% Z = a ;
+%% N = 2
+%% Z = b ;
+%% No
+%% ?- 
+%% \end{prologcode*}
+
+%% \end{frame}
+
+\begin{frame}[fragile]{A Prolog Meta-Interpreter}
+
+An interpreter for Prolog in Prolog: provides a framework for changing
+operation (for example, replace DFS with iterative DFS).
+
+In \href{./programs/meta.pl}{meta.pl}:
+
+\begin{prologcode*}{}
+solve(true):-
+  !.
+solve((Goal, Goals)):-
+  !, 
+  solve(Goal),
+  solve(Goals).
+solve(Goal):-
+  clause(Goal, Body),
+  solve(Body).
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Meta-Interpreter Log}
+
+\begin{prologcode*}{}
+?- solve(parent(bill, X)).
+X = marge ;
+X = harry ;
+No
+?- solve(ancestor(jill, X)).
+X = mary ;
+X = frank ;
+No
+?- 
+\end{prologcode*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Prolog Programming Heuristics}
+
+\begin{itemize}
+
+\item Approach program declaratively; i.e. concentrate on writing true facts
+and rules about the domain.
+
+\item A Prolog \alert{procedure} which is collection of facts/rules for a particular head predicate should constitute a complete description for the relation specified by the head predicate.
+
+\item If a relation is a function, add additional argument for the result of
+the function.
+
+\item If a procedure is about a particular data-structure, use structural induction to ensure that all variants of the data-structure are covered, possibly by using a separate fact/rule for each variant of the data-structure.
+
+\item Often (not always) facts/rules for a procedure need to be
+  mutually-exclusive.  Ensured using pattern-matching in the head
+  and/or \alert{guard predicates} at the start of the body.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Prolog Programming Heuristics}
+
+\begin{itemize}
+
+\item If two variables must match (be \textit{equal}), simply use the
+  same variable name for both.
+
+\item If a statement is false, simply omit writing it (for example, by
+  simply omitting the case for \verb@[]@, \verb@member/2@ documents
+  the fact that no element is a member of an empty list).  Alternately,
+  you can document the fact that a statement is false by writing something
+  like \verb@member(_, []):- false.@
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Prolog Programming Heuristics Continued}
+
+Declaratively, order does not matter, but operationally it does matter.
+
+\begin{itemize}
+
+\item Write procedure with certain instantiation patterns in mind.
+
+\item Order facts/rules within a procedure to maximize the number of
+  instantiation patterns for which program terminates.  Usually, facts/rules
+  covering base cases before recursively-defined rules.
+
+\item Order the predicates within a body to ensure early failure.  Hence
+  guards to ensure that a rule is applicable should be at the start of 
+  the body.
+
+\item Add cuts, if-then-else only for efficiency, to trim redundant
+  solutions or prevent infinite loops.
+
+\item As far as possible, avoid red cuts.
+
+\end{itemize}
+
+\end{frame}
+\begin{frame}[fragile]{References}
+
+Textbook: Ch. 12.
+
+Paul Brna,
+\href{http://oopweb.com/Prolog/Documents/prologbook/VolumeFrames.html}{\em
+Prolog Programming: A First Course}.
+
+\href{http://www.swi-prolog.org/}{SWI-Prolog}.
+
+W. F. Clocksin and C. S. Mellish, "Programming in Prolog", 3rd Edition,
+Springer-Verlag, 1987.
+
+\end{frame}
+
+\end{document}

@@ -1,0 +1,163 @@
+\documentclass[12pt]{article}
+%\usepackage{html}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\title{CS 571\\Homework 3}
+%\addtolength{\topmargin}{-2cm}
+%\addtolength{\topskip}{-2cm}
+%\addtolength{\oddsidemargin}{-2cm}
+%\addtolength{\evensidemargin}{-2cm}
+%\addtolength{\textheight}{2cm}
+%\addtolength{\textwidth}{2cm}
+%\addtolength{\footskip}{-1cm}
+\date{}
+\begin{document}
+\maketitle
+
+\begin{flushleft}
+\textbf{Due}: Nov 14\hfill\textbf{100 points}\\
+
+%\textbf{No Late Submissions}
+
+\vspace{0.5cm}
+
+\textbf{Important Reminder}: As per the course Academic Honesty
+Statement, cheating of any kind will minimally result in receiving an
+F letter grade for the entire course.
+
+\vspace{0.5cm}
+To be submitted on paper in class.
+
+Justify all answers.
+\end{flushleft}
+
+\begin{enumerate}
+
+\item Given the following C program:
+
+\begin{verbatim}
+/* Introductory program */
+int main() {
+  printf("hello world\n");
+  return 0;
+}
+\end{verbatim}
+
+Assuming that the comment on the first line starts at column 0:
+
+\begin{enumerate}
+
+\item List the lexemes which would be produced by a scanner
+  for a compiler.
+
+\item List the lexemes which would be produced by a
+  scanner for a syntax-directed editor. 
+  
+\end{enumerate}
+\hfill\textit{10-points}
+
+\item Is the Haskell \verb@:@ operator equivalent to the Scheme
+  \verb@cons@ operator? \hfill\textit{5-points}
+
+\item The Haskell expression
+\begin{verbatim}
+  map ($5) [\x->x + 3, \x->x - 3]
+\end{verbatim}
+produces the result \verb@[8,2]@, while the Haskell expression
+\begin{verbatim}
+  map (5$) [\x->x + 3, \x->x - 3]
+\end{verbatim}
+results in an error.  Explain precisely how the former works and why the
+latter fails.  \hfill\textit{10-points}
+
+\item In Haskell, \verb@foldr@ can be used on infinite lists but \verb@foldl@ cannot.  Explain why. \hfill\textit{10-points}
+
+
+\item Discuss how you would represent a DFA in Haskell.  Specifically:
+
+\begin{enumerate}  
+  \item Specifically, describe how you would use
+  Haskell to represent \textit{state}s,
+  \textit{transition}s, and overall \textit{dfa}s.
+
+\item Show your representation for the DFA discussed around pg. 75 of
+  the \href{http://zdu.binghamton.edu/cs571-16f/slides/scheme/scheme.pdf}{Scheme transparencies}.
+
+  \item Describe how you would hide the details of your representation from
+    users of your representation.
+
+\end{enumerate}
+
+Note that Haskell allows richer representations than S-expressions.
+\hfill\textit{15-points}
+  
+  
+
+\item Given two finite sets $A$ and $B$.  What can you say
+  about the relative cardinalities of $A$ and $B$ when:
+
+  \begin{enumerate}
+
+  \item There is an injective total function $f$ from $A$ to $B$.
+
+  \item There is a surjective total function  $f$ 
+     from $A$ to $B$.
+
+   \item There is a bijective total function  $f$ from $A$ to $B$.
+
+  \end{enumerate}     \hfill\textit{15-points}
+
+
+
+\item Given two finite sets $A$ and $B$, how many bijective total
+  functions are there from $A$ to $B$?  Your answer should be given in
+  terms of the cardinalities $|A|$ and $|B|$. \hfill\textit{10-points}
+
+
+\item Which of the following propositional logic WFF's are tautologies.
+  Please remember to justify your answers.
+
+\begin{enumerate}
+
+  \item $p \Rightarrow p \vee q$
+
+  \item $p \Rightarrow p \wedge q$
+
+  \item $p \vee q \Rightarrow p \wedge q$.
+
+  \item $p \wedge q \Rightarrow p \vee q$.    
+    
+
+\end{enumerate} \hfill\textit{10-points}
+
+  
+
+\item Discuss the validities of the following statements:
+
+  \begin{enumerate}
+
+    \item A \textit{circular structure} is a structure which contains a
+    reference back to itself (directly or indirectly).  Since Haskell
+    does not support destructive assignment, it is impossible to
+    represent circular structures in Haskell.
+
+  \item Haskell's \verb@foldl@ can be implemented in a tail-recursive
+    manner.
+
+  \item Since Haskell allows infinite data structures, it is possible
+    to show that there are more real numbers than natural numbers by
+    simply comparing the length of the list of all real numbers with
+    the length of the list containing all natural numbers.
+
+
+  \item All data types in Haskell can be compared for equality using
+    the built-in \verb@==@ operator.
+
+  \item All functions are relations.
+
+  \end{enumerate} \hfill\textit{15-points}
+  
+
+\end{enumerate}
+
+\end{document}

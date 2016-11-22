@@ -1,0 +1,295 @@
+<html>
+<head>
+<title>CS 571 Programming Languages Startup Directions </title>
+</head>
+<body bgcolor="#ffffff">
+<h1 align="center">CS 571 Programming Languages Startup Directions </h1>
+<p>
+This handout documents what you need to do to set up your computer
+environments for this course.
+</p>
+<h2>Setting Up Your Account on the CS Linux Machines</h2>
+<p>
+All students registered for this course should have been given an account on
+<tt>remote.cs.binghamton.edu</tt> and should have been sent an email with their
+access information if the account was not already active.
+</p>
+<p>
+It is required that all submitted programming projects work under the
+environment available on <tt>remote</tt>.
+</p>
+<p>
+It is best that you set things up so that your account environment is
+setup automatically for the course.  Unfortunately, the method of
+doing so depends on the kind of login shell you are using as different
+shells use slightly different syntaxes.  Usually, you can determine
+which kind of shell you are using, based on the prompt you receive
+after you login: if the prompt contains a <tt>$</tt> character, you are
+probably using a <tt>sh</tt>-based shell; if the prompt contains a <tt>%</tt>
+character, you are probably using a <tt>csh</tt>-based shell.  One way to be
+sure which shell you are using is by looking at the output of the
+command <tt>ps -p $$</tt>.
+</p>
+<p>
+Use your favorite editor to make the below changes in your shell startup
+files (if you do not have a favorite editor, the end of this document
+contains instructions specific to <tt>emacs</tt>).
+</p>
+<p>
+If using a <tt>csh</tt>-type shell, then add the following line to your login
+startup file (usually <tt>~/.login</tt>):
+</p>
+<pre>
+        source ~umrigar/cs571-16f/bin/student.login
+</pre>
+<p>
+and the following line to the startup file run by your shell when started as
+a non-login shell (usually, <tt>~/.tcshrc</tt> or <tt>~/.cshrc</tt>):
+</p>
+<pre>
+        source ~umrigar/cs571-16f/bin/student.cshrc
+</pre>
+<p>
+If you are using a <tt>sh</tt>-based shell, you need to add the following line to
+your login startup file (one of <tt>~/.bash_profile</tt>, <tt>~/.bash_login</tt>, or
+<tt>~/.profile</tt> if using <tt>bash</tt>)
+</p>
+<pre>
+        . ~umrigar/cs571-16f/bin/student.profile
+</pre>
+<p>
+and the following line to the startup file run by your shell when started as
+a non-login shell (<tt>~/.bashrc</tt> if using <tt>bash</tt>):
+</p>
+<pre>
+        . ~umrigar/cs571-16f/bin/student.rc
+</pre>
+<p>
+Note the leading period in both cases.
+</p>
+<p>
+When you login <b>after</b> adding the above lines, you should see a <b>read-only</b>
+copy of the <tt>cs571-16f</tt> course directory in your home directory (this is
+merely a symbolic link to the master course directory).  This directory
+contains all the course material and mirrors the course web site.
+</p>
+<p>
+You are free to ignore these instructions if you know what you are doing.  A
+typical situation when you may want to ignore these instructions is when you
+are using the same account for other courses and the environment setup by
+these instructions interferes with the environment needed for the other
+courses.
+</p>
+<h2>The Organization of the <tt>cs571-16f</tt> Subdirectory</h2>
+<p>
+Typically, the <tt>cs571-16f</tt> directory will contain the following
+subdirectories:
+</p>
+<dl>
+<p><dt><tt>bin</tt><dd>
+    Shell scripts, etc.
+</p>
+<p><dt><a href="../../docs/">docs</a><dd>
+    Documentation.
+</p>
+<p><dt><a href="../../exams-quizzes/">exams</a><dd>
+    Exams and solutions.
+</p>
+<p><dt><a href="../../hws/">hws</a><dd>
+    Homeworks and solutions.
+</p>
+<p><dt><tt>include</tt><dd>
+    If present, it will contain header files for libraries specific
+    to this course.
+</p>
+<p><dt><tt>interludes</tt><dd>
+    If present, this directory will contain interesting material
+    marginally relevant or totally irrelevant to this course.
+</p>
+<p><dt><tt>lib</tt><dd>
+    If present, it will contain libraries specifically installed
+    for this course.
+</p>
+<p><dt><a href="../../misc/">misc</a><dd>
+    Miscellaneous information (including files like this)
+</p>
+<p><dt><a href="../../programs/">programs</a><dd>
+    Programs discussed during class.
+</p>
+<p><dt><a href="../../projects/">projects</a><dd>
+     Programming projects and solutions.
+</p>
+<p><dt><a href="../../slides">slides</a><dd>
+     Source, hardcopy and html versions of classroom transparencies.
+</p>
+<p><dt><tt>src</tt><dd>
+     If present, this directory will contain source code for tools and
+     libraries specifically installed for this course.
+</p>
+</dl>
+<p>
+Most of the above directory structure is available via the course home
+page at <a href="http://zdu.binghamton.edu/cs571-16f">http://zdu.binghamton.edu/cs571-16f</a>. The site is also mirror'd
+at <a href="http://cs.binghamton.edu/~umrigar/cs571-16f/">http://cs.binghamton.edu/~umrigar/cs571-16f/</a>.  Most of the
+subdirectories are currently empty, but will have material added as
+the course progresses.
+</p>
+<h2>Tracking Changes</h2>
+<p>
+Assuming you have setup your account as outlined above, each time you
+subsequently login to your account, you should be given a list of
+<i>interesting</i> source files which have changed since your last login.
+</p>
+<p>
+Note also that the course site is updated via a shared git repository
+which can be accessed using ssh at the URL:
+</p>
+<blockquote>
+<p>
+  <tt>ssh://</tt><i>user</i><tt>@remote.cs.binghamton.edu/~umrigar/cs571-16f.git</tt>
+</p>
+</blockquote>
+<p>
+where <i>user</i> is your login-id on <tt>remote</tt>.
+</p>
+<p>
+Specifically, assuming you have a ssh client and git on your local
+machine, you can clone the above repository using <tt>git clone</tt> <i>url</i>
+<i>dir</i>, where <i>url</i> is the above URL and <i>dir</i> is the directory into
+which you want to clone the repository.
+</p>
+<p>
+You can then track changes within <i>dir</i> using the <tt>git pull</tt> command.
+</p>
+<p>
+[Note: if you have set up your remote.cs account as outlined above,
+you will have already have a read-only copy of the <tt>cs571-16f</tt>
+directory in your home directory.]
+</p>
+<p>
+To see what changes have been made, use the <tt>git log -</tt><i>N</i> command in
+the <tt>cs571-16f</tt> directory to see the last <i>N</i> log messages; to see the
+last <i>N</i> log messages for <i>FILE</i> use <tt>git log -</tt><i>N</i> <i>FILE</i>; the log
+messages will include a 40 character hex hash specifying the revision.
+To see what has changed between two specific revisions use <tt>git diff
+-w -r </tt><i>HHHHH</i> <tt>-r</tt> <i>XXXXX</i> <i>FILE</i> where <i>HHHHH</i> and <i>XXXXX</i> are the
+first characters of the revisions you want to diff and <i>FILE</i> should
+specify the source file (usually <tt>.umt</tt>).
+</p>
+<h2>Local Development</h2>
+<p>
+We will be using open-source tools for this course and you are free to
+install them on your local machine.  If your local machine is
+sufficiently powerful with at least 3 GB of free disk space, 2 GB
+of free RAM and a recent x86-64 CPU which supports virtualization
+(VT-x/AMD-V), then you can run a environment on your local machine
+similar to that available on <tt>remote</tt> by running a vagrant-generated
+virtualbox VM on it.
+</p>
+<p>
+To facilitate this, a <a href="./Vagrantfile">Vagrantfile</a> is provided which
+can be used to set up a debian 7.11 x86-64 virtual machine containing
+most of the tools needed for this course.
+</p>
+<p>
+Specifically, you will need recent versions of both vagrant and virtualbox
+installed on your local machine.  It is suggested that you install the latest
+version of vagrant from the vagrant <a href="https://www.vagrantup.com/">site</a>.
+</p>
+<p>
+Copy the <a href="./Vagrantfile">Vagrantfile</a> into an empty directory and
+within that directory run the command <tt>vagrant up</tt>.  This should
+download all necessary packages and create the virtual machine (it
+should take under 1 hour on a typical home internet connection).
+</p>
+<p>
+You can login to your virtual machine using login-id <tt>vagrant</tt> with
+password <tt>vagrant</tt>.  Use the right control key if you loose your
+mouse.  Once logged in, you can start up a windowing environment using
+the command <tt>startxfce4</tt> (you are free to customize the machine and
+windowing environment as you wish).  It is probably a good idea to
+immediately change the <tt>vagrant</tt> password.  Note that the <tt>vagrant</tt>
+user has super-user access (using <tt>sudo</tt>); it may be a good idea to
+setup a unprivileged user for regular work.
+</p>
+<p>
+You can run a full-screen X11 environment using the command
+<tt>startxfce4</tt>.
+</p>
+<p>
+The use of vagrant is not supported; if you have problems, you
+are expected to debug them by yourself.
+</p>
+<p>
+<b>It is still your responsibility to ensure that all submitted
+programming projects work on remote.cs</b>.
+</p>
+<h2>Instructions for Those Unfamiliar with a Unix Environment</h2>
+<p>
+If you do not already have a favorite editor for Unix systems, then <tt>emacs</tt>
+is strongly recommended, as it is much more than a editor and provides all
+the functions of a IDE.  The instructions below refer to emacs.
+</p>
+<p>
+In what follows, notation like <tt>C-x</tt> refers to holding
+down the control and <tt>x</tt> keys simultaneously, while <tt>ESC x</tt> refers to
+hitting the <tt>ESC</tt> key followed by the <tt>x</tt> key.
+</p>
+<p>
+<b>If emacs does not appear to be working properly, the most likely cause is
+that your terminal is configured incorrectly</b>.  Usually, you will be using a
+terminal emulator which will be emulating something like a <tt>vt100</tt> terminal.
+In that case, you would need to set the environmental variable <tt>TERM</tt> to
+<tt>vt100</tt>.  Once again, the syntax depends on the shell family being used: use
+<tt>TERM=vt100; export TERM</tt> for <tt>sh</tt>-based shells and <tt>setenv TERM vt100</tt> for
+<tt>csh</tt>-based shells.
+</p>
+<p>
+<b>Remember that almost all emacs commands can be aborted using</b> <tt>C-g</tt>.
+</p>
+<h5>Setting Up Your Account</h5>
+<p>
+Setting up your account typically involves adding a line to a couple
+of startup files.  The following assumes that you are using <tt>tcsh</tt> as
+your shell and gives detailed instructions for adding a line to your
+<tt>~/.login</tt> file which is executed each time you login (vary the
+instructions according to your specific requirements; specifically,
+the added content will change if you are using a sh-based shell):
+</p>
+<ol type="1">
+<p><li>
+While in your home directory, type <tt>emacs .login</tt> to the Unix
+      prompt.  Emacs will be entered and will display the contents of the
+      file.
+</p>
+<p><li>
+Next use the cursor control down-arrow (or <tt>C-n</tt>) to move to the
+      end of the file.
+</p>
+<p><li>
+Insert the following line:
+<pre>
+        source ~umrigar/cs571-16f/bin/student.login
+</pre>
+<p>
+      <b>You must terminate this line using a newline</b> --- i.e. you should get
+      the cursor onto the next line.
+</p>
+</p>
+<p><li>
+Run the <tt>save-buffer</tt> command by using <tt>C-x C-s</tt>, and then exit emacs by
+      using the <tt>C-x C-c</tt> (<tt>save-buffers-kill-emacs</tt>) command.
+</p>
+</ol>
+<p>
+Next time you log in, a read-only directory called <tt>cs571-16f</tt> should appear in
+your home-directory.  This directory will contain all the files you need for
+this course.
+</p>
+<p>
+If you would like to learn emacs further, you can run the emacs tutorial
+by typing <tt>C-h t</tt> while inside emacs.  You can read the online emacs
+manual by typing <tt>C-h i</tt>.
+</p>
+</body>
+</html>

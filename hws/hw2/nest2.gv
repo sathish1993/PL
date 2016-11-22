@@ -1,0 +1,51 @@
+graph G {
+  label = "'((a b) c () ((d (e))))"
+  ordering = "out"
+  bgcolor=transparent;
+  node [shape="circle" fillcolor="blue" style="filled" penwidth="0"
+       width="0.1" height="0.1"]
+  t1 [label="" xlabel="n1"]
+  t2 [label="" xlabel="n2"]
+  t3 [label="" xlabel="n3"]
+  t4 [label="" xlabel="n4"]
+  t5 [label="" xlabel="n5"]
+  t6 [label="" xlabel="n6"]
+  t7 [label="" xlabel="n7"]
+  t8 [label="" xlabel="n8"]
+  t9 [label="" xlabel="n9"]
+  t10 [label="" xlabel="n10"]
+
+  node [shape=none width="0.3" height="0.3" fillcolor="gray"];
+  a [label="'a"]
+  b [label="'b"]
+  nil1 [label="'()"]
+  c [label="'c"]
+  nil2 [label="'()"]
+  d [label="'d"]
+  e [label="'e"]
+  nil3 [label="'()"]
+  nil4 [label="'()"]
+  nil5 [label="'()"]
+  nil [label="'()"]
+
+  t1 -- t2
+  t2 -- a
+  t2 -- t3
+  t3 -- b
+  t3 -- nil1
+  t1 -- t4
+  t4 -- c
+  t4 -- t5
+  t5 -- nil2
+  t5 -- t6
+  t6 -- t7
+  t7 -- t8
+  t8 -- d
+  t8 -- t9
+  t9 -- t10
+  t10 -- e
+  t10 -- nil3
+  t9 -- nil4
+  t7 -- nil5
+  t6 -- nil
+}

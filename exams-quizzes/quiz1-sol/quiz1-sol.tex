@@ -1,0 +1,282 @@
+\documentclass[12pt]{article}
+%\usepackage{html}
+\usepackage{hyperref}
+\title{CS 571\\Quiz 1 Annotated Solution}
+%\addtolength{\topmargin}{-2cm}
+%\addtolength{\topskip}{-2cm}
+%\addtolength{\oddsidemargin}{-2cm}
+%\addtolength{\evensidemargin}{-2cm}
+%\addtolength{\textheight}{2cm}
+%\addtolength{\textwidth}{2cm}
+%\addtolength{\footskip}{-1cm}
+\date{}
+\begin{document}
+\maketitle
+
+\begin{flushleft}
+\textbf{Sep 19}\hfill\textbf{Closed book}\\
+\textbf{15 points}\hfill\textbf{Closed notes}\\
+
+\vspace{0.5cm}
+
+\textbf{Important Reminder}: As per the course Academic Honesty
+Statement, cheating of any kind will minimally result in receiving an
+F letter grade for the entire course.
+
+
+\end{flushleft}
+
+For each of the following questions, select a \textbf{single}
+alternative on the grid-sheet.  Please ensure that you have filled-in
+your name in the bubbles on the provided grid-sheet; the B-number is
+not required.
+
+There are 7 questions with 2-points per question; there is 1-point
+for submitting the quiz.
+
+\begin{enumerate}
+
+\item Which of the following statements about standard regular
+  expression notation is false?
+
+\begin{enumerate}
+
+\item The infix \verb@.@ binary operator is used to denote the concatenation
+  of two regular expressions.
+
+\item The infix \verb@|@ binary operator is used to denote the alternation
+  of two regular expressions.
+
+\item The postfix \verb@*@ unary operator is used to denote 0-or-more
+  repetitions of a regular expression.
+
+\item The postfix \verb@?@ unary operator is used to denote an
+optional regular expression.
+
+\item The postfix \verb@+@ unary operator is used to denote 1-or-more
+  repetitions of a regular expression.
+    
+\end{enumerate}
+
+\textbf{Answer}: (a).
+
+Standard regular expression uses the juxtaposition of two regular
+expressions to denote concatenation. 
+
+\item Which of the following programming languages is very different
+  from the others in terms of syntax?
+\begin{enumerate}
+
+\item Algol
+
+\item Pascal
+
+\item Lisp
+
+\item C
+
+\item C++
+
+\end{enumerate}
+
+\textbf{Answer}: (c).
+
+Lisp uses a parenthesized prefix notation whereas all the other
+languages use a more traditional syntax.
+
+\item Which of the following regular expressions describes strings of
+  one-or-more \verb@a@'s followed \textbf{optionally} by a single
+  \verb@b@ followed by zero-or-more \verb@a@'s (ignore whitespace added
+  for readability within each regex)?
+
+\begin{enumerate}
+
+\item \verb@a? b* a+@
+
+\item \verb@a a* b? a*@
+
+\item \verb@a* b? a* a@
+
+\item \verb@a+ b? a+@
+
+\item \verb@a* b+ a+@
+
+\end{enumerate}
+
+\textbf{Answer}: (b).
+
+(b) consists of one \verb@a@ followed by 0-or-more \verb@a@'s followed
+by an optional \verb@b@ followed by 0-or-more \verb@a@'s which is
+clearly what is required.  The other alternatives are incorrect: (a)
+only allows a prefix of 0-or-1 \verb@a@'s; (c) allows a prefix of
+0-or-more \verb@a@'s; (d) requires a suffix of one-or-more \verb@a@'s;
+(e) requires one-or-more \verb@b@'s.
+
+\item Which of the following languages over the vocabulary $\{$\verb@a@, \verb@b@$\}$ is not expressible using standard regular expressions?
+
+\begin{enumerate}
+
+\item Strings whose length is exactly 5.  Examples include \verb@aabab@,
+  \verb@babab@ and \verb@aaaaa@.
+  
+\item Strings whose length must be a multiple of 3.  Examples include
+  the empty string, \verb@aba@, \verb@aabbab@.
+
+\item Strings of length less-than-or-equal-to 8 which consist of
+  a sequence of \verb@a@'s followed by an equal number of \verb@b@'s.
+  Examples include the empty string, \verb@ab@ and \verb@aaabbb@.
+
+\item Strings of arbitrary length containing 1-or-more \verb@a@'s
+  followed by 0-or-more \verb@b@'s.  Examples include \verb@aaa@,
+  \verb@a@ and \verb@abbb@.
+
+\item Strings of arbitrary length which consist of
+  a sequence of \verb@a@'s followed by an equal number of \verb@b@'s.
+  Examples include the empty string, \verb@ab@ and \verb@aaaabbbb@.
+
+\end{enumerate}
+
+\textbf{Answer}: (e).
+
+(e) requires that a number of \verb@a@'s be balanced using the same
+number of \verb@b@'s but regular expressions cannot be used to specify
+arbitrary balanced constructs.  All the other alternatives can be
+expressed using regexps's: \verb@[ab][ab][ab][ab][ab]@ for (a),
+\verb@([ab][ab][ab])*@ for (b), \verb@|ab|aabb|aaabbb|aaaabbbb@ for
+(c) and \verb@a+b*@ for (d).
+
+
+\item Given the following CFG over the set of terminal symbols 
+  \verb@NUMBER@, \verb@#@, \verb@^@, \verb@!@, \verb@(@ and \verb@)@:
+
+\begin{verbatim}
+
+exp
+  : exp '#' term
+  | term
+  ;
+term
+  : factor '^' term
+  | factor
+  ;
+factor
+  : factor '!'
+  | '(' exp ')'
+  | NUMBER
+  ;
+\end{verbatim}
+
+Which of the following statements about the precedence and associativity of
+the operators \verb@#@, \verb@^@, and \verb@!@ is true?
+
+\begin{enumerate}
+
+  \item \verb@^@ has lowest precedence, followed by \verb@#@ with
+    higher precedence, followed by \verb@!@ with highest precedence.
+    \verb@#@ is right-associative, while \verb@^@ is left-associative.
+
+  \item \verb@#@ has lowest precedence, followed by \verb@^@ with
+    higher precedence, followed by \verb@!@ with highest precedence.
+    \verb@#@ is left-associative, while \verb@^@ is right-associative.
+
+  \item \verb@!@ has lowest precedence, followed by \verb@^@ with
+    higher precedence, followed by \verb@#@ with highest precedence.
+    \verb@#@ is left-associative, while \verb@^@ is right-associative.
+
+  \item \verb@#@ has lowest precedence, followed by \verb@^@ with
+    higher precedence, followed by \verb@!@ with highest precedence.
+    \verb@#@ is right-associative, while \verb@^@ is left-associative.
+
+  \item \verb@!@ has lowest precedence, followed by \verb@^@ with
+    higher precedence, followed by \verb@#@ with highest precedence.
+    \verb@#@ is right-associative, while \verb@^@ is left-associative.
+
+      
+    
+\end{enumerate}
+
+\textbf{Answer}: (b).
+
+The operators occur in the grammar in order \verb@#@, \verb@^@,
+\verb@!@ with \verb@#@ closest to the start symbol.  Hence the
+precedences increase in the order \verb@#@, \verb@^@, \verb@!@.  Since
+\verb@#@ occurs in a left-recursive rule it is left-associative, while
+\verb@^@ is right-associative since it occurs in a right-recursive
+rule.
+
+\item Which of the following describes the language consisting of
+$n$ \verb@a@'s followed by exactly $n$ \verb@b@'s for $n >= 0$?
+
+\begin{enumerate}
+
+\item The regular expression \verb@a*b*@.
+
+\item The CFG:
+\begin{verbatim}
+           S
+             : 'a' S 'b'
+             | //empty
+             ;
+\end{verbatim}
+
+\item The regular expression \verb@a+b+@.
+
+\item The CFG:
+\begin{verbatim}
+           S
+             : 'a' S 'b'
+             | 'a' 'b'
+             ;
+\end{verbatim}
+
+\item The CFG:
+\begin{verbatim}
+           S
+             : 'a' 'a' S 'b' 'b'
+             | //empty
+             ;
+\end{verbatim}
+
+\end{enumerate}
+
+\textbf{Answer}: (b).
+
+In (b), the 2nd alternative allows for the empty string; the
+first alternative allows some number of \verb@a@'s followed by an
+equal number of \verb@b@'s.
+
+(a) and (c) cannot be acceptable since regexp's cannot describe
+balanced constructs of arbitrary length, (d) does not allow $n = 0$
+while (e) requires even $n$.
+
+\item Which of the following statements is false?
+
+\begin{enumerate}
+
+\item A \textit{scanner} converts a stream of characters into a stream of tokens.
+
+\item A recursive-descent parser must have a parsing function for each
+  non-terminal in the grammar.
+
+\item The stack frame for a function activation will typically contain
+  the return address for that activation.
+
+\item If a grammar permits a derivation containing a step with
+  ambiguity about which non-terminal should be expanded next, then
+  the grammar is defined to be \textit{ambiguous}.
+
+\item The \verb@match()@ function of a recursive-descent parser must
+match the current terminal, else signal an error.
+
+\end{enumerate}
+
+\textbf{Answer}: (d).
+
+An ambiguous grammar is one which allows multiple parse trees.  It is
+perfectly normal for derivations to permit multiple non-terminals at
+any step; for a non-ambiguous grammar the same parse tree will result
+irrespective of the order in which those non-terminals are expanded.
+
+\end{enumerate}
+
+\end{document}

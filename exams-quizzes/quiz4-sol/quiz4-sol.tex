@@ -1,0 +1,223 @@
+\documentclass[12pt]{article}
+%\usepackage{html}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\title{CS 571\\Quiz 4 Solution}
+%\addtolength{\topmargin}{-2cm}
+%\addtolength{\topskip}{-2cm}
+%\addtolength{\oddsidemargin}{-2cm}
+%\addtolength{\evensidemargin}{-2cm}
+%\addtolength{\textheight}{2cm}
+%\addtolength{\textwidth}{2cm}
+%\addtolength{\footskip}{-1cm}
+\date{}
+\begin{document}
+\maketitle
+
+\begin{flushleft}
+  \textbf{Nov 9}   (Actually held on Nov 14)\hfill\textbf{Closed book}\\
+\textbf{15 points}\hfill\textbf{Closed notes}\\
+
+\vspace{0.5cm}
+
+\textbf{Important Reminder}: As per the course Academic Honesty
+Statement, cheating of any kind will minimally result in receiving an
+F letter grade for the entire course.
+
+
+\end{flushleft}
+
+\textbf{Please ensure that you have filled-in BOTH your name and
+  B-number in the bubbles on the provided grid-sheet.}
+
+For each of the following questions, select a \textbf{single}
+alternative on the grid-sheet.  
+
+There are 7 questions with 2-points per question; there is 1-point
+for submitting the quiz.
+
+\begin{enumerate}
+
+\item What will be the result of evaluating the following Haskell expression?
+
+\begin{verbatim}
+length [[1, 2], [3, 4], [5]]
+\end{verbatim}
+
+\begin{enumerate}
+
+\item An error will occur.
+\item \verb@2@.  
+\item \verb@3@.  
+\item \verb@4@.  
+\item \verb@5@.  
+  
+\end{enumerate}
+
+\textbf{Answer}: (c).
+
+\verb@length@ returns the number of elements in a list.  In this case,
+the argument list has 3 elements (which themselves are lists).  Hence
+the \verb@length@ will evaluate as 3.
+
+\item What will be the result of evaluating the following Haskell expression?
+
+\begin{verbatim}
+length [(x, y) | x <- [1..10], y <- "abcde"]  
+\end{verbatim}
+
+\begin{enumerate}
+
+\item An error will occur.
+
+\item 10.
+
+\item 15.
+
+\item 20.
+
+\item 50.  
+
+\end{enumerate}
+
+\textbf{Answer}: (e).
+
+The list comprehension builds a list of pairs \verb@(x, y)@ with
+\verb@x@ $\in$ \verb@[1, 2, 3, ..., 10]@ and \verb@y@ $\in$
+\verb@['a', 'b', 'c', 'd', 'e']@.  So there are $10$ possibilities for
+\verb@x@ and $5$ possibilities for \verb@y@; hence there are a
+total of $10\times 5 = 50$ possible pairs.  Hence the length of
+the list of pairs will be 50.
+
+\item What will be the result of evaluating the following Haskell expression?
+
+\begin{verbatim}
+foldl (-) 1 [1, 2, 3]
+\end{verbatim}
+
+\begin{enumerate}
+\item An error will occur.
+
+\item \verb@1@.
+
+\item \verb@-1@
+  
+\item \verb@5@.
+
+\item \verb@-5@.
+
+  
+\end{enumerate}
+
+\textbf{Answer}: (e).
+
+The expression will apply \verb@-@ from the left with initial
+value \verb@1@.  Hence the expression is equivalent to
+\verb@((1-1)-2)-3@ which is -5.
+
+
+\item What will be the value of evaluating the following Haskell
+  expression?
+
+\begin{verbatim}
+foldr (-) 1 [1, 2, 3]
+\end{verbatim}
+
+\begin{enumerate}
+
+\item An error will occur.
+
+\item \verb@1@.
+
+\item \verb@-1@
+  
+\item \verb@5@.
+
+\item \verb@-5@.
+
+\end{enumerate}
+
+\textbf{Answer}: (b).
+
+The expression will apply \verb@-@ from the right with initial
+value \verb@1@.  Hence the expression is equivalent to
+\verb@(1-(2-(3-1))@ which is 1.
+
+\item Which of the following is not a legal Haskell expression?
+
+\begin{enumerate}
+
+\item \verb@[1, 2, 3]@.
+
+\item \verb@['a', 'b'] ++ "c"@.
+
+\item \verb@[1, 2, [1]]@.
+
+\item \verb@[['a', 'b'], "cd"]@.
+
+\item \verb@[[1], [2]]@.
+
+\end{enumerate}
+
+\textbf{Answer}: (c).
+
+(c) cannot be typed since lists must be of homogeneous type, but the
+elements of (c) are \verb@NUM@'s and a list of \verb@NUM@.  (a) is a
+simple list of \verb@Num@, (b) is equivalent to \verb@"abc"@ with type
+list of \verb@Char@, (d) is equivalent to \verb@["ab", "cd"]@ with
+type list of list of \verb@Char@, and (e) is a list of list of
+\verb@Num@.
+
+\item What will be the result of evaluating the following Haskell expression?
+
+\begin{verbatim}
+foldr (++) "x" ["abc", "de", "f"] 
+\end{verbatim}
+
+\begin{enumerate}
+
+\item An error will occur.
+
+\item \verb@"abcdef"@.
+
+\item \verb@"fedcba"@.  
+  
+\item \verb@"xabcdef"@.
+
+\item \verb@"abcdefx"@.
+
+\end{enumerate}
+
+\textbf{Answer}: (e).
+
+The \verb@foldr@ folds the \verb@++@ append operation over the list
+and is equivalent to \verb@"abc" ++ "de" ++ "f" ++ "x"@ resulting in 
+\verb@"abcdefx"@.
+
+\item Given sets $A = \{1, 2, 3, 4\}$ and $B = \{a, b, c, d\}$, which of
+  the following is \textbf{not} a function from $A$ to $B$.
+
+\begin{enumerate}
+\item $\{\}$.
+
+\item $\{(1, a), (2, a), (3, a), (4, a)\}$.  
+
+\item $\{(1, a), (2, b), (3, c), (4, d)\}$.  
+
+\item $\{(1, b), (2, b), (1, d), (4, d)\}$.  
+
+\item $\{(1, a)\}$.  
+
+  
+\end{enumerate}
+\textbf{Answer}: (d).
+
+An essential property for a function is that it must map a single
+element in the domain to a unique element in the range; however, (d)
+maps \verb@1@ to both \verb@b@ and \verb@d@.  The other alternatives
+do not have similar violations of this function property.  Note that
+(a) is a function which is undefined over all elements of its domain.
+
+\end{enumerate}
+
+\end{document}
